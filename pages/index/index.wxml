@@ -1,13 +1,78 @@
 <!--index.wxml-->
 <view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
+  <view class="earningsWrapper">
+    <text class="title">税后所得</text>
+    <view class="earnings">{{earnings}}
+      <text class="unit">元</text>
+    </view>
+    <view class="taxWrapper">
+      <view class="tax">个税：{{incomeTax}}</view>
+      <view class="tax">社保：{{socialTax}}</view>
+      <view class="tax">公积金：{{accumulationTax}}</view>
+    </view>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class="formWrapper">
+    <view class="formItem">
+      <text>税前工资</text>
+      <input bindinput="bindInputChange" type="digit" class="formChange" data-name="grossWage" placeholder="请输入"
+             value="{{form.grossWage}}"/>
+    </view>
+    <view class="formItem">
+      <text>起征点</text>
+      <input bindinput="bindInputChange" type="digit" class="formChange" data-name="threshold" placeholder="请输入"
+             value="{{form.threshold}}"/>
+    </view>
+  </view>
+
+  <view class="formWrapper">
+    <view class="formItem">
+      <text>是否缴纳社保</text>
+      <switch bindchange="bindSwitchChange" checked="{{form.hasSocialTax}}" data-name="hasSocialTax" />
+    </view>
+    <view class="formItem" hidden="{{!form.hasSocialTax}}">
+      <text>社保基数</text>
+      <input bindchange="bindInputChange" type="digit" class="formChange" data-name="socialTaxBase" placeholder="按照工资"
+             value="{{form.socialTaxBase}}"/>
+    </view>
+  </view>
+
+  <view class="formWrapper">
+    <view class="formItem">
+      <text>是否缴纳公积金</text>
+      <switch bindchange="bindSwitchChange" checked="{{form.hasAccumulationTax}}" data-name="hasAccumulationTax"/>
+    </view>
+    <view hidden="{{!form.hasAccumulationTax}}">
+      <view class="formItem">
+        <text>公积金基数</text>
+        <input bindchange="bindInputChange" type="digit" class="formChange" data-name="accumulationTaxBase" placeholder="按照工资"
+               value="{{form.accumulationTaxBase}}"/>
+      </view>
+      <view class="formItem">
+        <text>公积金比例</text>
+        <picker class="formChange" bindchange="bindPickerChange" value="{{form.accumulationTaxScale}}" range="{{form.accumulationTaxScaleList}}" data-name="accumulationTaxScale">
+          <text>{{form.accumulationTaxScaleList[form.accumulationTaxScale]}}%</text>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <view class="formWrapper" hidden="{{!form.hasAccumulationTax}}">
+    <view class="formItem">
+      <text>是否缴纳补充公积金</text>
+      <switch bindchange="bindSwitchChange" checked="{{form.hasAddAccumulationTax}}" data-name="hasAddAccumulationTax"/>
+    </view>
+    <view hidden="{{!form.hasAddAccumulationTax}}">
+      <view class="formItem">
+        <text>公积金基数</text>
+        <input bindchange="bindInputChange" type="digit" class="formChange" data-name="addAccumulationTaxBase" placeholder="请输入"
+               value="{{form.addAccumulationTaxBase}}"/>
+      </view>
+      <view class="formItem">
+        <text>公积金比例</text>
+        <picker class="formChange" bindchange="bindPickerChange" value="{{form.addAccumulationTaxScale}}" range="{{form.addAccumulationTaxScaleList}}" data-name="addAccumulationTaxScale">
+          <text>{{form.addAccumulationTaxScaleList[form.addAccumulationTaxScale]}}%</text>
+        </picker>
+      </view>
+    </view>
   </view>
 </view>

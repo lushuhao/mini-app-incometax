@@ -14,6 +14,16 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const mathRound = (number, precision = 2) => {
+  if (typeof number !== 'number') {
+    return 0
+  }
+  number = (Math.round(number * 10 ** precision) / 10 ** precision).toFixed(precision)
+
+  return number
+}
+
 module.exports = {
-  formatTime: formatTime
+  formatTime,
+  mathRound
 }

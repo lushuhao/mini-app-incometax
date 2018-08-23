@@ -1,54 +1,143 @@
 //index.js
-//获取应用实例
-const app = getApp()
+
+import { mathRound } from '../../utils/util'
+
+const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
+const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
-  },
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
-  },
-  onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
+    earnings: 0,
+    incomeTax: 0,
+    socialTax: 0,
+    accumulationTax: 0,
+    form: {
+      grossWage: '',
+      threshold: 5000,
+      hasSocialTax: true,
+      socialTaxBase: '',
+      hasAccumulationTax: true,
+      accumulationTaxBase: '',
+      accumulationTaxScale: 0,
+      accumulationTaxScaleList: [5, 6, 7, 8, 9, 10, 11, 12],
+      hasAddAccumulationTax: false,
+      addAccumulationTaxBase: '',
+      addAccumulationTaxScale: 0,
+      addAccumulationTaxScaleList: [0, 1, 2, 3, 4, 5, 6, 7],
     }
   },
-  getUserInfo: function(e) {
-    console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
+  onLoad() {
+
+  },
+  bindChange(e) {
+    const name = `form.${e.currentTarget.dataset.name}`
     this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
+      [name]: e.detail.value
+    }, () => {
+      this.calculateEarnings()
     })
+  },
+  bindInputChange(e) {
+    this.bindChange(e)
+  },
+  bindSwitchChange(e) {
+    this.bindChange(e)
+  },
+  bindPickerChange(e) {
+    this.bindChange(e)
+  },
+  calculateEarnings() {
+    let earnings, income, socialTax, accumulationTax;
+    let { grossWage, socialTaxBase, accumulationTaxBase, addAccumulationTaxBase } = this.data.form
+    const {
+      threshold,
+      hasSocialTax,
+      hasAccumulationTax,
+      hasAddAccumulationTax,
+      addAccumulationTaxScale,
+      addAccumulationTaxScaleList
+    } = this.data.form
+
+    socialTaxBase = socialTaxBase || grossWage
+    accumulationTaxBase = accumulationTaxBase || grossWage
+    addAccumulationTaxBase = addAccumulationTaxBase || grossWage
+
+    if (hasSocialTax) { // 社保
+      this.calculateSocialTax(socialTaxBase)
+
+      grossWage = grossWage - this.mySocialTaxInsurance
+    }
+
+    if (hasAccumulationTax) { // 公积金
+      this.calculateAccumulationTax(accumulationTaxBase)
+
+      grossWage = grossWage - this.myAccumulationTax
+    }
+
+    if (hasAddAccumulationTax) { // 补充公积金
+      this.calculateAddAccumulationTax(addAccumulationTaxBase)
+
+      grossWage = grossWage - this.myAddAccumulationTax
+    }
+
+    if (grossWage > threshold) {
+      grossWage = grossWage - threshold
+      this.calculateIncomeTax(grossWage)
+      grossWage = grossWage - this.incomeTaxTotal
+    } else {
+      this.incomeTaxTotal = 0
+    }
+
+    this.setData({
+      earnings: mathRound(grossWage),
+      incomeTax: mathRound(this.incomeTaxTotal),
+      socialTax: mathRound(this.mySocialTaxInsurance),
+      accumulationTax: mathRound(this.myAccumulationTax)
+    })
+  },
+
+  calculateSocialTax(socialTaxBase) {
+    const mySocialTaxInsurance = {
+      endowment: socialTaxBase * 0.08,
+      medical: socialTaxBase * 0.02,
+      unemployment: socialTaxBase * 0.01,
+    }
+
+    this.mySocialTaxInsurance = socialTaxBase * (0.08 + 0.02 + 0.01)
+
+    const companySocialTaxInsurance = {
+      endowment: socialTaxBase * 0.2,
+      medical: socialTaxBase * 0.08,
+      unemployment: socialTaxBase * 0.02,
+      employment: socialTaxBase * 0.01,
+      birth: socialTaxBase * 0.01
+    }
+
+    this.companySocialTaxInsurance = socialTaxBase * (0.2 + 0.08 + 0.02 + 0.01 + 0.01)
+  },
+  calculateAccumulationTax(accumulationTaxBase) {
+    const {
+      accumulationTaxScale,
+      accumulationTaxScaleList
+    } = this.data.form
+    this.myAccumulationTax = accumulationTaxBase * accumulationTaxScaleList[accumulationTaxScale] * 0.01
+  },
+  calculateAddAccumulationTax(addAccumulationTaxBase) {
+    const {
+      addAccumulationTaxScale,
+      addAccumulationTaxScaleList
+    } = this.data.form
+    this.myAddAccumulationTax = addAccumulationTaxBase * addAccumulationTaxScaleList[addAccumulationTaxScale] * 0.01
+  },
+  calculateIncomeTax(grossWage) {
+    let taxIndex = incomeTaxList.findIndex((tax) => {
+      return tax > grossWage
+    })
+    let incomeTaxTotal = (grossWage - incomeTaxList[taxIndex - 1]) * incomeTaxScaleList[taxIndex]
+    while (taxIndex > 1) {
+      taxIndex--
+      incomeTaxTotal = incomeTaxTotal + (incomeTaxList[taxIndex] - incomeTaxList[taxIndex - 1]) * incomeTaxScaleList[taxIndex]
+    }
+    this.incomeTaxTotal = incomeTaxTotal
   }
 })
