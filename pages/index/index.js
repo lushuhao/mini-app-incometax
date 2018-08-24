@@ -100,20 +100,20 @@ Page({
     const mySocialTaxInsurance = {
       endowment: socialTaxBase * 0.08,
       medical: socialTaxBase * 0.02,
-      unemployment: socialTaxBase * 0.01,
+      unemployment: socialTaxBase * 0.005,
     }
 
-    this.mySocialTaxInsurance = socialTaxBase * (0.08 + 0.02 + 0.01)
+    this.mySocialTaxInsurance = Object.values(mySocialTaxInsurance).reduce((total, item) =>  (total += item))
 
     const companySocialTaxInsurance = {
       endowment: socialTaxBase * 0.2,
-      medical: socialTaxBase * 0.08,
-      unemployment: socialTaxBase * 0.02,
-      employment: socialTaxBase * 0.01,
+      medical: socialTaxBase * 0.095,
+      unemployment: socialTaxBase * 0.005,
+      employment: socialTaxBase * 0.002,
       birth: socialTaxBase * 0.01
     }
 
-    this.companySocialTaxInsurance = socialTaxBase * (0.2 + 0.08 + 0.02 + 0.01 + 0.01)
+    this.companySocialTaxInsurance = Object.values(companySocialTaxInsurance).reduce((total, item) =>  (total += item))
   },
   calculateAccumulationTax(accumulationTaxBase) {
     const {
