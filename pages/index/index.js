@@ -163,9 +163,9 @@ Page({
       addAccumulationTaxScaleList
     } = this.data.form
 
-    socialTaxBase = socialTaxBase || grossWage
-    accumulationTaxBase = accumulationTaxBase || grossWage
-    addAccumulationTaxBase = addAccumulationTaxBase || grossWage
+    socialTaxBase = socialTaxBase || 0
+    accumulationTaxBase = accumulationTaxBase || 0
+    addAccumulationTaxBase = addAccumulationTaxBase || 0
 
     this.calculateSocialTax(socialTaxBase) // 社保
     grossWage = grossWage - this.mySocialTaxInsurance
