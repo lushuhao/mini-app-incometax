@@ -14,7 +14,7 @@
   <view class="formWrapper">
     <view class="formItem">
       <text>税前工资</text>
-      <input bindinput="bindChange" type="digit" class="formChange" data-name="grossWage" placeholder="请输入" maxlength="8"
+      <input bindinput="bindChange" focus="{{grossWageFocus}}" type="digit" class="formChange" data-name="grossWage" placeholder="请输入" maxlength="8"
              value="{{form.grossWage}}"/>
     </view>
     <view class="formItem">

@@ -84,6 +84,7 @@ const taxTitle = {
 
 Page({
   data: {
+    grossWageFocus: true,
     earnings: 0,
     incomeTax: 0,
     socialTax: 0,
