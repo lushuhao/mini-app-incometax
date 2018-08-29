@@ -1,0 +1,109 @@
+/**index.wxss**/
+page {
+  background: #f5f5f5;
+}
+
+.earningsWrapper {
+  position: relative;
+  background: #fcb816;
+  color: #fff;
+  padding: 15px;
+
+  .title {
+    font-size: 12px;
+  }
+
+  .earnings {
+    padding: 15px 0 30px;
+    font-size: 30px;
+    line-height: 1;
+
+    .unit {
+      padding-left: 5px;
+      font-size: 12px;
+    }
+  }
+
+  .taxWrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, .05);
+    line-height: 10px;
+    font-size: 10px;
+
+    .tax {
+      flex: 1;
+      padding: 10px 10px;
+
+      &:nth-child(-n+2) {
+        border-right: 1px solid #fcb816;
+      }
+    }
+  }
+}
+
+.formWrapper {
+  margin-top: 10px;
+  padding-left: 15px;
+  background: #fff;
+  font-size: 14px;
+  color: #999;
+
+  .formItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px 10px 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #eee;
+    }
+
+    .formChange {
+      flex: 0 70%;
+    }
+
+    input {
+      caret-color: #fcb816;
+      color: #333;
+    }
+
+    .input-placeholder {
+      color: #999;
+    }
+  }
+}
+
+.taxDetail {
+  margin: 10px 0;
+  padding: 10px;
+  background: #fff;
+  box-shadow: 0 0 1px #ccc;
+
+  .taxItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 30px;
+    color: #666;
+
+    text {
+      &:first-child {
+        width: 20%;
+        white-space: nowrap;
+      }
+
+      &:nth-child(n+2) {
+        width: 33%;
+        text-align: right;
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "mini-app-salary",
+  "version": "1.1.0",
+  "description": "上海五险一金及税后工资计算器",
+  "main": "gulpfile.js",
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp build --type prod",
+    "clean": "gulp clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lushuhao/mini-app-salary.git"
+  },
+  "keywords": [
+    "五险一金",
+    "税后工资"
+  ],
+  "author": "lushuhao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lushuhao/mini-app-salary/issues"
+  },
+  "homepage": "https://github.com/lushuhao/mini-app-salary#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^8.0.0",
+    "gulp-html-minify": "0.0.14",
+    "gulp-jdists": "^2.2.3",
+    "gulp-json-minify": "^1.2.2",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-postcss": "^7.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1",
+    "minimist": "^1.2.0",
+    "postcss-font-base64": "^1.0.5",
+    "postcss-px2rpx": "0.0.4",
+    "run-sequence": "^2.2.1",
+    "stream-combiner2": "^1.1.1",
+    "through2": "^2.0.3"
+  }
+}

@@ -49,7 +49,7 @@
       <text>是否缴纳补充公积金</text>
       <switch bindchange="bindChange" checked="{{form.hasAddAccumulationTax}}" data-name="hasAddAccumulationTax"/>
     </view>
-    <view hidden="{{!form.hasAddAccumulationTax}}">
+    <view wx:if="{{form.hasAddAccumulationTax}}">
       <view class="formItem">
         <text>公积金基数</text>
         <input bindinput="bindChange" type="digit" class="formChange" data-name="addAccumulationTaxBase"
