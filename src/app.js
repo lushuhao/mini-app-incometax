@@ -1,3 +1,4 @@
-//app.js
+import './utils/polyfill'
+
 App({
 })
