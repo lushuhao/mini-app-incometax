@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp build --type prod",
-    "clean": "gulp clean"
+    "clean": "gulp clean",
+    "create": "gulp create --name"
   },
   "repository": {
     "type": "git",

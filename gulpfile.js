@@ -1,4 +1,5 @@
 const gulp = require('gulp')
+const fs = require('fs')
 const rename = require('gulp-rename')
 const postcss = require('gulp-postcss')
 const px2rpx = require('postcss-px2rpx')
@@ -57,8 +58,8 @@ gulp.task('js', () => {
       presets: ['@babel/env']
     }),
     isProd ? uglify({
-        compress: true
-      }) : through.obj(),
+      compress: true
+    }) : through.obj(),
 
     isProd ? through.obj() : sourcemaps.write('./'),
     gulp.dest(dist)
@@ -101,5 +102,54 @@ gulp.task('dev', ['clean'], () => {
 gulp.task('build', ['clean'], () => {
   runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs')
 })
+
+gulp.task('create', () => {
+  const [pathname, name] = process.argv[4].split('/')
+  const dirname = `${src}/${pathname}/${name}`
+  const fileList = createWxFileList(pathname, name)
+  fs.mkdir(dirname, () => {
+    console.log('创建文件夹：', name)
+    fileList.forEach((item) => {
+      fs.writeFile(`${dirname}/${name}${item.ext}`, item.content, (err) => {
+        if (err) {
+          console.error(err)
+        }
+        console.log('文件创建成功：', `${name}${item.ext}`)
+      })
+    })
+  })
+})
+
+const createWxFileList = (pathname, name) => {
+  let jsContent, jsonContent
+   switch (pathname){
+     case 'components':
+       jsContent = 'Component({})'
+       jsonContent = '{\n  "component": true\n}'
+       break
+     case 'pages':
+       jsContent = 'Page({})'
+       jsonContent = `{\n  "navigationBarTitleText": "${name}"\n}`
+       break
+   }
+  return [
+    {
+      ext: '.js',
+      content: jsContent
+    },
+    {
+      ext: '.json',
+      content: jsonContent
+    },
+    {
+      ext: '.wxml',
+      content: `<view class="${name}"></view>`
+    },
+    {
+      ext: '.scss',
+      content: `.${name}{}`
+    }
+  ]
+}
 
 
