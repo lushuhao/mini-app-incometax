@@ -73,4 +73,5 @@
       <text>{{item.companyTax}}</text>
     </view>
   </view>
+  <feedback />
 </view>

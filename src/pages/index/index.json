@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "税后工资计算器",
+  "usingComponents": {
+    "feedback": "/components/feedback/feedback"
+  }
+}

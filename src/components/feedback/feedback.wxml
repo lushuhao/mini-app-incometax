@@ -1,1 +1,3 @@
-<view class="feedback"></view>
+<view class="feedback">
+  <button type="primary" plain open-type="feedback">建议反馈</button>
+</view>
