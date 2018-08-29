@@ -17,6 +17,8 @@ const combiner = require('stream-combiner2')
 const sourcemaps = require('gulp-sourcemaps')
 const runSequence = require('run-sequence')
 const jdists = require('gulp-jdists')
+const eslint = require('gulp-eslint')
+const gulpIf = require('gulp-if')
 const babel = require('gulp-babel')
 const uglify = require('gulp-uglify')
 const htmlmini = require('gulp-htmlmin')
@@ -27,6 +29,10 @@ const cssnano = require('gulp-cssnano')
 const isProd = argv.type === 'prod'
 const src = './src'
 const dist = './dist'
+
+function isFixed(file) {
+  return file.eslint != null && file.eslint.fixed;
+}
 
 const handleError = (err) => {
   console.log('\n')
@@ -69,6 +75,11 @@ gulp.task('js', () => {
     gulp.src(`${src}/**/*.js`),
 
     jdists({trigger: isProd ? 'prod' : 'dev'}),
+
+    eslint({fix:true}),
+    eslint.format(),
+    gulpIf(isFixed, gulp.dest(src)), // 修复后的文件放回原处
+    eslint.failAfterError(),
 
     // 生产环境不生成shoucemap，传入空的流处理方法
     isProd ? through.obj() : sourcemaps.init(),
@@ -142,14 +153,14 @@ gulp.task('create', () => {
 const createWxFileList = (pathname, name) => {
   let jsContent, jsonContent
   switch (pathname) {
-    case 'components':
-      jsContent = 'Component({})'
-      jsonContent = '{\n  "component": true\n}'
-      break
-    case 'pages':
-      jsContent = 'Page({})'
-      jsonContent = `{\n  "navigationBarTitleText": "${name}"\n}`
-      break
+  case 'components':
+    jsContent = 'Component({})'
+    jsonContent = '{\n  "component": true\n}'
+    break
+  case 'pages':
+    jsContent = 'Page({})'
+    jsonContent = `{\n  "navigationBarTitleText": "${name}"\n}`
+    break
   }
   return [
     {
