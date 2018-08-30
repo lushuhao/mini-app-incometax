@@ -3,7 +3,7 @@ import {mathRound} from '../../utils/util'
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
 const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
 const socialTaxBaseList = [4279, 21396]
-const accumulationTaxBaseList = [4600, 42800]
+const accumulationTaxBaseList = [2300, 21396]
 const mySocialTaxInsurance = (socialTaxBase) => ({
   endowment: socialTaxBase * 0.08,
   medical: socialTaxBase * 0.02,
@@ -216,7 +216,7 @@ Page({
       accumulationTaxScaleList
     } = this.data.form
     this.accumulationTax = accumulationTaxBase * accumulationTaxScaleList[accumulationTaxScale] * 0.01
-    this.accumulationTax = mathRound(this.accumulationTax)
+    this.accumulationTax = mathRound(Math.ceil(this.accumulationTax))
   },
   calculateAddAccumulationTax(addAccumulationTaxBase) { // 补充公积金
     const {
