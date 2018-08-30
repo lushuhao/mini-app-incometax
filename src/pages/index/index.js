@@ -13,7 +13,7 @@ const companySocialTaxInsurance = (socialTaxBase) => ({
   endowment: socialTaxBase * 0.2,
   medical: socialTaxBase * 0.095,
   unemployment: socialTaxBase * 0.005,
-  employment: socialTaxBase * 0.002,
+  employment: socialTaxBase * 0.001,
   birth: socialTaxBase * 0.01
 })
 const genTaxDetailList = () => ({
@@ -52,7 +52,7 @@ const genTaxDetailList = () => ({
     name: '工伤保险',
     myTax: '',
     companyTax: '',
-    companyTaxScale: 0.002,
+    companyTaxScale: 0.001,
     hiddenMyTax: true
   },
   birth: {
