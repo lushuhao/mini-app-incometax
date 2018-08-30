@@ -31,7 +31,7 @@ const src = './src'
 const dist = './dist'
 
 function isFixed(file) {
-  return file.eslint != null && file.eslint.fixed;
+  return file.eslint && file.eslint.fixed;
 }
 
 const handleError = (err) => {
@@ -134,32 +134,34 @@ gulp.task('build', ['clean'], () => {
 })
 
 gulp.task('create', () => {
-  const [pathname, name] = process.argv[4].split('/')
-  const dirname = `${src}/${pathname}/${name}`
-  const fileList = createWxFileList(pathname, name)
-  fs.mkdir(dirname, () => {
-    console.log('创建文件夹：', name)
+  console.log(argv)
+  const file = argv.file
+    const dir = argv.dir
+  const path = `${src}/${dir}/${file}`
+  const fileList = createWxFileList(dir, file)
+  fs.mkdir(path, () => {
+    console.log('创建文件夹：', path)
     fileList.forEach((item) => {
-      fs.writeFile(`${dirname}/${name}${item.ext}`, item.content, (err) => {
+      fs.writeFile(`${path}/${file}${item.ext}`, item.content, (err) => {
         if (err) {
           console.error(err)
         }
-        console.log('文件创建成功：', `${name}${item.ext}`)
+        console.log('文件创建成功：', `${file}${item.ext}`)
       })
     })
   })
 })
 
-const createWxFileList = (pathname, name) => {
+const createWxFileList = (dir, file) => {
   let jsContent, jsonContent
-  switch (pathname) {
+  switch (dir) {
   case 'components':
     jsContent = 'Component({})'
     jsonContent = '{\n  "component": true\n}'
     break
   case 'pages':
     jsContent = 'Page({})'
-    jsonContent = `{\n  "navigationBarTitleText": "${name}"\n}`
+    jsonContent = `{\n  "navigationBarTitleText": "${file}"\n}`
     break
   }
   return [
@@ -173,11 +175,11 @@ const createWxFileList = (pathname, name) => {
     },
     {
       ext: '.wxml',
-      content: `<view class="${name}"></view>`
+      content: `<view class="${file}"></view>`
     },
     {
       ext: '.scss',
-      content: `.${name}{}`
+      content: `.${file}{}`
     }
   ]
 }

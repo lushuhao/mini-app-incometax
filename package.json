@@ -8,7 +8,8 @@
     "build": "npm run lint & gulp build --type prod",
     "clean": "gulp clean",
     "lint": "eslint --fix src",
-    "create": "gulp create --name"
+    "create": "gulp create --dir pages --file ",
+    "create:components": "gulp create --dir components --file "
   },
   "repository": {
     "type": "git",
