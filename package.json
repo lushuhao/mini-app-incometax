@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/lushuhao/mini-app-salary#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "gulp-eslint": "^5.0.0"
   },
   "devDependencies": {
