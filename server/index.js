@@ -3,7 +3,7 @@ const path = require('path')
 const colors = require('ansi-colors')
 const log = require('fancy-log')
 
-const { getCityList, getBaseInfoByCity } = require('./api')
+const { getCityList, getBaseInfoByCity, getScaleByCity } = require('./api')
 const { dataDirPath, dataName } = require('./config')
 const { writeJson, obj2array } = require('./util')
 
@@ -41,7 +41,16 @@ function genAllCityBaseJson() {
   }, 1000)
 }
 
+function genAllCityScaleJson() {
+  getScaleByCity().then(res => {
+    log(res.data.shebao)
+  })
+}
 
-genCityListJson().then(() => {
-  genAllCityBaseJson()
-})
+// genCityListJson().then(() => {
+//   genAllCityBaseJson()
+// })
+
+genAllCityScaleJson()
+
+
