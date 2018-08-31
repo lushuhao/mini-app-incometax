@@ -1,6 +1,5 @@
 const gulp = require('gulp')
 const del = require('del')
-const fs = require('fs')
 const rename = require('gulp-rename')
 
 const through = require('through2')
@@ -132,56 +131,3 @@ gulp.task('dev', ['clean'], () => {
 gulp.task('build', ['clean'], () => {
   runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs')
 })
-
-gulp.task('create', () => {
-  console.log(argv)
-  const file = argv.file
-    const dir = argv.dir
-  const path = `${src}/${dir}/${file}`
-  const fileList = createWxFileList(dir, file)
-  fs.mkdir(path, () => {
-    console.log('创建文件夹：', path)
-    fileList.forEach((item) => {
-      fs.writeFile(`${path}/${file}${item.ext}`, item.content, (err) => {
-        if (err) {
-          console.error(err)
-        }
-        console.log('文件创建成功：', `${file}${item.ext}`)
-      })
-    })
-  })
-})
-
-const createWxFileList = (dir, file) => {
-  let jsContent, jsonContent
-  switch (dir) {
-  case 'components':
-    jsContent = 'Component({})'
-    jsonContent = '{\n  "component": true\n}'
-    break
-  case 'pages':
-    jsContent = 'Page({})'
-    jsonContent = `{\n  "navigationBarTitleText": "${file}"\n}`
-    break
-  }
-  return [
-    {
-      ext: '.js',
-      content: jsContent
-    },
-    {
-      ext: '.json',
-      content: jsonContent
-    },
-    {
-      ext: '.wxml',
-      content: `<view class="${file}"></view>`
-    },
-    {
-      ext: '.scss',
-      content: `.${file}{}`
-    }
-  ]
-}
-
-
