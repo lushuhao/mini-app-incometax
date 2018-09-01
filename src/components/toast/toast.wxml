@@ -1,0 +1,3 @@
+<view class="toast" hidden="{{!showToast}}">
+  <text>{{text}}</text>
+</view>
