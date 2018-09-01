@@ -24,7 +24,7 @@ function getCityList() {
 /**
  * 根据城市获取社保基数
  * @param city
- * @returns {Promise.<TResult>}
+ * @returns {Promise}
  */
 function getBaseInfoByCity(city) {
   return axios
@@ -39,21 +39,45 @@ function getBaseInfoByCity(city) {
 }
 
 /**
- * 根据城市获取社保比例
- * @param city
- * @returns {Promise.<TResult>}
+ * 根据社保code获取社保比例
+ * @param social
+ * @returns {Promise}
  */
-function getScaleByCity(city) {
+function getScaleBySocial(social) {
   return axios({
     method: 'post',
     url: apis.getScale,
-    data: 'sbBase=3396.35&sbCode=anqingshebao', // body一行，用对象传入字符串识别不了
-  }).catch(err => console.error(err))
+    data: `sbBase=0&sbCode=${social}`, // body一行，用对象传入字符串识别不了
+  }).then(res => {
+    const scocialItems = res.data.shebao.items
+    const social = {myScale: {}, companyScale: {}}
+    scocialItems.forEach(item => {
+      const key = socialInsuranceType[item.itemName]
+      /**
+       * 无百分比的，取固定金额
+       * 医疗保险与个人医疗保险重复，取其中有值的进行赋值
+       */
+      social.myScale[key] = item.empProp.split(/×/)[1] || social.myScale[key] || item.empFee
+      social.companyScale[key] = item.orgProp.split(/×/)[1] || social.companyScale[key] || item.orgFee
+    })
+    return social
+  })
+}
+
+const socialInsuranceType = {
+  ['养老保险']: 'endowment',
+  ['医疗保险']: 'medical',
+  ['个人医疗保险']: 'medical',
+  ['单位医疗保险']: 'medical',
+  ['大病医疗保险']: 'seriousDiseases',
+  ['失业保险']: 'unemployment',
+  ['工伤保险']: 'employment',
+  ['生育保险']: 'birth'
 }
 
 module.exports = {
   apis,
   getCityList,
   getBaseInfoByCity,
-  getScaleByCity
+  getScaleBySocial
 }

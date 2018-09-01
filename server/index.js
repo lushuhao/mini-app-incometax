@@ -3,9 +3,9 @@ const path = require('path')
 const colors = require('ansi-colors')
 const log = require('fancy-log')
 
-const { getCityList, getBaseInfoByCity, getScaleByCity } = require('./api')
-const { dataDirPath, dataName } = require('./config')
-const { writeJson, obj2array } = require('./util')
+const {getCityList, getBaseInfoByCity, getScaleBySocial} = require('./api')
+const {dataDirPath, dataName} = require('./config')
+const {writeJson, obj2array, recursionGenJson} = require('./util')
 
 function genCityListJson() {
   return getCityList().then(res => {
@@ -21,35 +21,36 @@ function genAllCityBaseJson() {
     return item.value
   })
 
-  let counter = 0
-  const maxLength = cityCodeArray.length || -1
-  let data = {}
-  const timer = setInterval(() => {
-    if (counter >= maxLength) {
+  recursionGenJson(cityCodeArray, getBaseInfoByCity)
+    .then(data => {
       writeJson(data, dataName.cityBase)
-      return clearInterval(timer)
-    }
-    const cityCode = cityCodeArray[counter++]
-    getBaseInfoByCity(cityCode)
-      .then(res => {
-        data[cityCode] = res
-        log(colors.green(`[${counter} / ${cityCodeArray.length}]`), colors.cyan(cityCode))
-      })
-      .catch(err => {
-        log(colors.red(`[${counter} / ${maxLength}]`), colors.yellow(cityCode), colors.magenta(err))
-      })
-  }, 1000)
+    })
 }
 
 function genAllCityScaleJson() {
-  getScaleByCity().then(res => {
-    log(res.data.shebao)
+  const cityBase = require(path.resolve(dataDirPath, dataName.cityBase))
+  // 获取所有城市社保code
+  const socialCodeList = Object.keys(cityBase).map(item => {
+    return {
+      [item]: cityBase[item].shebao[0].code
+    }
   })
+
+  recursionGenJson(socialCodeList, getScaleBySocial)
+    .then(data => {
+      // console.log(data)
+      writeJson(data, dataName.social)
+    })
+    .catch(res => {
+      log(colors.red(res))
+    })
 }
 
 // genCityListJson().then(() => {
 //   genAllCityBaseJson()
 // })
+
+// genAllCityBaseJson()
 
 genAllCityScaleJson()
 

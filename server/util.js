@@ -42,7 +42,39 @@ function obj2array(obj) {
   return Array.prototype.concat(...Object.values(obj))
 }
 
+/**
+ * 遍历数组调用接口并合并数据
+ * @param codeArray
+ * @param apiHandle
+ * @returns {Promise}
+ */
+function recursionGenJson(codeArray, apiHandle) {
+  return new Promise(resolve => {
+    let counter = 0
+    const maxLength = codeArray.length || -1
+    let data = {}
+    const timer = setInterval(() => {
+      if (counter >= maxLength) {
+        clearInterval(timer)
+        return resolve(data)
+      }
+      const codeInfo = codeArray[counter++]
+      const code = typeof codeInfo === 'object' ? Object.values(codeInfo)[0] : codeInfo
+      const key = typeof codeInfo === 'object' ? Object.keys(codeInfo)[0] : codeInfo
+      apiHandle(code)
+        .then(res => {
+          data[key] = res
+          log(colors.green(`[${counter} / ${codeArray.length}]`), colors.cyan(key))
+        })
+        .catch(err => {
+          log(colors.red(`[${counter} / ${maxLength}]`), colors.yellow(key), colors.magenta(err))
+        })
+    }, 1000)
+  })
+}
+
 module.exports = {
   writeJson,
-  obj2array
+  obj2array,
+  recursionGenJson
 }
