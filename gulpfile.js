@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const gulp = require('gulp')
 const del = require('del')
 const rename = require('gulp-rename')
@@ -28,7 +30,8 @@ const cssnano = require('gulp-cssnano')
 const isProd = argv.type === 'prod'
 const src = './src'
 const dist = './dist'
-const data = './mock'
+const mock = './mock'
+const router = './router'
 
 function isFixed(file) {
   return file.eslint && file.eslint.fixed;
@@ -72,11 +75,11 @@ gulp.task('wxss', () => {
 
 gulp.task('js', () => {
   const combined = combiner.obj([
-    gulp.src(`${src}/**/*.js`),
+    gulp.src([`${src}/**/*.js`, `!${src}/collect/**`]),
 
     jdists({trigger: isProd ? 'prod' : 'dev'}),
 
-    eslint({fix:true}),
+    eslint({fix: true}),
     eslint.format(),
     gulpIf(isFixed, gulp.dest(src)), // 修复后的文件放回原处
     eslint.failAfterError(),
@@ -100,9 +103,14 @@ gulp.task('js', () => {
 
 gulp.task('json', () => {
   return gulp
-    .src([`${src}/**/*.json`, `${data}/**/*.json`])
+    .src(`${src}/**/*.json`)
     .pipe(isProd ? jsonminify() : through.obj())
     .pipe(gulp.dest(dist))
+})
+
+gulp.task('projectConfig', () => {
+  return gulp.src(`${dist}/project.config.json`)
+    .pipe(gulp.dest(src))
 })
 
 gulp.task('images', () => {
@@ -113,22 +121,55 @@ gulp.task('wxs', () => {
   return gulp.src(`${src}/**/*.wxs`).pipe(gulp.dest(dist))
 })
 
+gulp.task('collect', () => {
+  return gulp.src([`${mock}/*.json`, `${router}/*.json`])
+    .pipe(through.obj(function (file, enc, cb) {
+      file.contents = Buffer.concat([Buffer.from('module.exports = '), file.contents])
+      this.push(file)
+      cb()
+    }))
+    .pipe(isProd ? jsonminify() : through.obj())
+    .pipe(rename({
+      extname: ".js"
+    }))
+    .pipe(eslint({fix: true}), eslint.format())
+    .pipe(gulp.dest(`${src}/collect/`))
+    .pipe(gulp.dest(`${dist}/collect/`))
+})
+
+gulp.task('route', () => {
+  const {pages} = require(`${src}/app.json`)
+  const routers = {}
+  pages.forEach(path => {
+    // pages/index/index -> index_index
+    // pages/a/b/c -> b_c
+    const routerKey = path.split(/pages\//)[1].split(/\//).slice(-2).join('_')
+    routers[routerKey] = `/${path}`
+  })
+  const content = JSON.stringify(routers)
+  fs.writeFileSync(`${router}/routers.json`, content)
+})
+
 gulp.task('watch', () => {
   ['wxml', 'wxss', 'js', 'json', 'wxs'].forEach(v => {
     gulp.watch(`${src}/**/*.${v}`, [v])
   })
   gulp.watch(`${src}/images/**`, ['images'])
   gulp.watch(`${src}/**/*.scss`, ['wxss'])
+  gulp.watch(`${dist}/project.config.json`, ['projectConfig'])
+  log(colors.green(`监听${src}目录下文件变动`))
 })
 
 gulp.task('clean', () => {
   return del(['./dist/**'])
 })
 
-gulp.task('dev', ['clean'], () => {
-  runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'watch')
+gulp.task('dev', () => {
+  runSequence(['route', 'projectConfig'], ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], 'watch')
 })
 
-gulp.task('build', ['clean'], () => {
-  runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs')
+gulp.task('build', () => {
+  runSequence('projectConfig', 'clean', 'route', ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], () => {
+    log(colors.cyan(`所有文件打包到${dist}`), colors.green('ok'))
+  })
 })

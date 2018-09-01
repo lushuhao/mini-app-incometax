@@ -13,7 +13,8 @@
   "globals": {
     "App": true,
     "Page": true,
-    "Component": true
+    "Component": true,
+    "wx": true
   },
   "rules": {
     "indent": [
@@ -31,6 +32,8 @@
     "semi": [
       "error",
       "never"
-    ]
+    ],
+    "no-console": 0,
+    "no-debugger": 0
   }
 }

@@ -4,6 +4,7 @@
   "description": "上海五险一金及税后工资计算器",
   "main": "gulpfile.js",
   "scripts": {
+    "watch": "gulp watch",
     "dev": "gulp dev",
     "build": "npm run lint & gulp build --type prod",
     "clean": "gulp clean",
@@ -43,7 +44,6 @@
     "gulp-jdists": "^2.2.3",
     "gulp-jsonminify": "^1.1.0",
     "gulp-postcss": "^7.0.0",
-    "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.1",
@@ -52,6 +52,7 @@
     "postcss-px2rpx": "0.0.4",
     "run-sequence": "^2.2.1",
     "stream-combiner2": "^1.1.1",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "gulp-rename": "latest"
   }
 }

@@ -1,0 +1,1 @@
+module.exports = {'index_index':'/pages/index/index','social_cityList':'/pages/social/cityList'}

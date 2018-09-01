@@ -13,8 +13,9 @@ npm i
 
 ### 编译
 ```shell
-npm run dev   // 开发，监听文件改动
-npm run build // 压缩文件
+npm run watch // 监听文件改动
+npm run dev   // 打包，监听文件改动
+npm run build // 压缩文件，打包，提交审核前执行
 npm run clean // 清空dist目录
 npm run lint  // eslint修复
 ```
