@@ -23,3 +23,23 @@ npm run lint  // eslint修复
 ```shell
 *.js *.json *.scss *.wxml // 会将scss转成wxss，px自动转rpx
 ```
+
+### mock数据
+* 社保缴费比例一般在每年7月更新
+```shell
+npm run server // node server/index.js
+```
+```js
+// server/index.js
+// 将注释的代码放开，运行npm run server
+
+
+// genCityListJson()
+//   .then(() => {
+//     genAllCityBaseJson()
+//   })
+
+// genAllCityBaseJson()
+
+// genAllCityScaleJson()
+```

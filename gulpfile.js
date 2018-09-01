@@ -28,6 +28,7 @@ const cssnano = require('gulp-cssnano')
 const isProd = argv.type === 'prod'
 const src = './src'
 const dist = './dist'
+const data = './mock'
 
 function isFixed(file) {
   return file.eslint && file.eslint.fixed;
@@ -99,7 +100,7 @@ gulp.task('js', () => {
 
 gulp.task('json', () => {
   return gulp
-    .src(`${src}/**/*.json`)
+    .src([`${src}/**/*.json`, `${data}/**/*.json`])
     .pipe(isProd ? jsonminify() : through.obj())
     .pipe(gulp.dest(dist))
 })
