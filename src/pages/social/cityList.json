@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "切换城市",
+  "disableScroll": true,
+  "usingComponents": {
+    "toast": "/components/toast/toast"
+  }
+}

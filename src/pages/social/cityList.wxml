@@ -1,0 +1,20 @@
+<scroll-view scroll-y
+             scroll-with-animation
+             scroll-top="{{scrollTop}}"
+             bindscroll="bindScroll"
+             class="cityList">
+  <view class="cityListWrapper" wx:for="{{cityList}}" wx:for-index="cityKey" wx:key="{{index}}">
+    <view id="{{cityKey}}" class="cityKey">{{cityKey}}</view>
+    <view class="cityName" wx:for="{{item}}" wx:for-item="city" wx:key="{{index}}">{{city.name}}</view>
+  </view>
+</scroll-view>
+<view bindtouchstart="touchStart"
+      bindtouchmove="touchMove"
+      bindtouchend="touchEnd"
+      hidden="{{!cityKeyList.length}}"
+      class="list-shortcut">
+  <view wx:for="{{cityKeyList}}" wx:key="{{item}}" data-key="{{item}}"
+        class="item {{item === toCityKey ? 'current' : ''}}">{{item}}
+  </view>
+</view>
+<toast wx:if="{{showToast}}" text="{{toCityKey}}"/>
