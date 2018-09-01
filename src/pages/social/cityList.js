@@ -125,6 +125,7 @@ Page({
           toCityKey: key
         }, resolve)
       }
+      resolve()
     })
   }
 })
