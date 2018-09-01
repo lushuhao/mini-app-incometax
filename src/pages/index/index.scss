@@ -67,6 +67,10 @@ page {
 
     .formChange {
       flex: 0 70%;
+      
+      &.city{
+        color: #333;
+      }
     }
 
     input {

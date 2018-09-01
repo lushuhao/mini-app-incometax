@@ -13,8 +13,13 @@
   </view>
   <view class="formWrapper">
     <view class="formItem">
+      <text>当前城市</text>
+      <view class="formChange city" bindtap="changeCity">{{city}}</view>
+    </view>
+    <view class="formItem">
       <text>税前工资</text>
-      <input bindinput="bindChange" focus="{{grossWageFocus}}" type="digit" class="formChange" data-name="grossWage" placeholder="请输入" maxlength="8"
+      <input bindinput="bindChange" focus="{{grossWageFocus}}" type="digit" class="formChange" data-name="grossWage"
+             placeholder="请输入" maxlength="8"
              value="{{form.grossWage}}"/>
     </view>
     <view class="formItem">
@@ -47,7 +52,7 @@
   <view class="formWrapper" hidden="{{!form.accumulationTaxBase}}">
     <view class="formItem">
       <text>是否缴纳补充公积金</text>
-      <switch bindchange="bindChange" checked="{{form.hasAddAccumulationTax}}" data-name="hasAddAccumulationTax"/>
+      <switch bindchange="bindChange" checked="{{form.hasAddAccumulationTax}}" data-name="hasAddAccumulationTax" />
     </view>
     <view wx:if="{{form.hasAddAccumulationTax}}">
       <view class="formItem">
@@ -73,5 +78,5 @@
       <text>{{item.companyTax}}</text>
     </view>
   </view>
-  <feedback />
+  <feedback/>
 </view>

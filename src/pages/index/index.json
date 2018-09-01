@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "税后工资计算器",
+  "navigationBarTitleText": "工资社保计算器",
   "usingComponents": {
     "feedback": "/components/feedback/feedback"
   }
