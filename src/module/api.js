@@ -1,6 +1,9 @@
 const apiUrls = {
   geoCoder: 'https://apis.map.qq.com/ws/geocoder/v1/?location=',
-  cityList: 'https://wx.lushuhao.xyz/mock/cityList.json'
+  preMock: 'https://wx.lushuhao.xyz',
+  cityList: 'https://wx.lushuhao.xyz/mock/cityList.json',
+  cityBase: 'https://wx.lushuhao.xyz/mock/cityBase.json',
+  socialList: 'https://wx.lushuhao.xyz/mock/socialList.json',
 }
 
 /**
@@ -27,6 +30,7 @@ function fetch(opts) {
  * @description 逆地址解析
  * @param lat 经度
  * @param lng 纬度
+ * @returns {*}
  */
 function getAddressByLocation(lat, lng) {
   const QQ_MAP_KEY = 'EFVBZ-ZOBKP-O2ZD5-LGKRT-RJVA7-Q2FS6'
@@ -49,8 +53,30 @@ function getCityList() {
   })
 }
 
+/**
+ * 获取社保基数
+ * @returns {*}
+ */
+function getCityBase() {
+  return wx.fetch({
+    url: apiUrls.cityBase
+  })
+}
+
+/**
+ * 获取社保比例
+ * @returns {*}
+ */
+function getSocialList() {
+  return wx.fetch({
+    url: apiUrls.socialList
+  })
+}
+
 module.exports = {
   fetch,
   getAddressByLocation,
-  getCityList
+  getCityList,
+  getCityBase,
+  getSocialList
 }

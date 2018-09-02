@@ -1,7 +1,9 @@
 const KEY = {
   LOCATION: '_location',
   CITY: '_city',
-  CITYLIST: '_cityList',
+  CITY_LIST: '_cityList',
+  CITY_BASE: '_cityBase',
+  SOCIAL_LIST: '_socialList',
 }
 
 /**
