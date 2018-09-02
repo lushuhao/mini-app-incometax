@@ -1,5 +1,5 @@
-import cityList from '../../collect/cityList'
 import {setCurrentCity} from '../../module/location'
+import {getCityListInStorage} from '../../module/mock'
 
 Page({
   data: {
@@ -11,12 +11,7 @@ Page({
     touch: false, // touch事件触发
   },
   onLoad() {
-    this.setData({
-      cityList,
-      cityKeyList: Object.keys(cityList)
-    }, () => {
-      this.getShortCutOffset()
-    })
+    this.getCityList()
     wx.user.getSystemInfo().then(systemInfo => {
       this.windowHeight = systemInfo.windowHeight
     })
@@ -35,6 +30,17 @@ Page({
   },
   onShareAppMessage() {
     // return custom share data when user share.
+  },
+  getCityList() {
+    getCityListInStorage()
+      .then(cityList => {
+        this.setData({
+          cityList,
+          cityKeyList: Object.keys(cityList)
+        }, () => {
+          this.getShortCutOffset()
+        })
+      })
   },
   selectCity(e) {
     setCurrentCity(e.currentTarget.dataset.city)

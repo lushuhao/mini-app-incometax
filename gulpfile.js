@@ -17,7 +17,6 @@ const sass = require('gulp-sass')
 const combiner = require('stream-combiner2')
 const sourcemaps = require('gulp-sourcemaps')
 const runSequence = require('run-sequence')
-const jdists = require('gulp-jdists')
 const eslint = require('gulp-eslint')
 const gulpIf = require('gulp-if')
 const babel = require('gulp-babel')
@@ -76,15 +75,12 @@ gulp.task('wxss', () => {
 gulp.task('js', () => {
   const combined = combiner.obj([
     gulp.src([`${src}/**/*.js`, `!${src}/collect/**`]),
-
-    jdists({trigger: isProd ? 'prod' : 'dev'}),
-
     eslint({fix: true}),
     eslint.format(),
     gulpIf(isFixed, gulp.dest(src)), // 修复后的文件放回原处
     eslint.failAfterError(),
 
-    // 生产环境不生成shoucemap，传入空的流处理方法
+    // 生产环境不生成sourcemap，传入空的流处理方法
     isProd ? through.obj() : sourcemaps.init(),
 
     babel({
@@ -122,7 +118,7 @@ gulp.task('wxs', () => {
 })
 
 gulp.task('collect', () => {
-  return gulp.src([`${mock}/*.json`, `${router}/*.json`])
+  return gulp.src(`${router}/*.json`)
     .pipe(through.obj(function (file, enc, cb) {
       file.contents = Buffer.concat([Buffer.from('module.exports = '), file.contents])
       this.push(file)
@@ -169,7 +165,7 @@ gulp.task('dev', () => {
 })
 
 gulp.task('build', () => {
-  runSequence('projectConfig', 'clean', 'route', ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], () => {
+  runSequence('projectConfig', 'clean', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], () => {
     log(colors.cyan(`所有文件打包到${dist}`), colors.green('ok'))
   })
 })

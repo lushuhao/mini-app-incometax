@@ -1,5 +1,6 @@
 const apiUrls = {
-  geoCoder: 'https://apis.map.qq.com/ws/geocoder/v1/?location='
+  geoCoder: 'https://apis.map.qq.com/ws/geocoder/v1/?location=',
+  cityList: 'https://wx.lushuhao.xyz/mock/cityList.json'
 }
 
 /**
@@ -38,7 +39,18 @@ function getAddressByLocation(lat, lng) {
   })
 }
 
+/**
+ * 获取城市列表
+ * @returns {*}
+ */
+function getCityList() {
+  return wx.fetch({
+    url: apiUrls.cityList,
+  })
+}
+
 module.exports = {
   fetch,
-  getAddressByLocation
+  getAddressByLocation,
+  getCityList
 }
