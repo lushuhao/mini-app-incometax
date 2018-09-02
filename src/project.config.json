@@ -33,19 +33,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": -1,
 			"list": [
 				{
-					"id": -1,
+					"id": 0,
 					"name": "切换城市",
 					"pathName": "pages/social/cityList",
-					"query": ""
-				},
-				{
-					"id": -1,
-					"name": "首页",
-					"pathName": "pages/index/index",
-					"query": ""
+					"query": "city='shanghai'"
 				}
 			]
 		}

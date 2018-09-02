@@ -1,5 +1,4 @@
-import './module/polyfill'
-import './module/proxy'
+import './module/init'
 
 App({
   onLaunch() {

@@ -1,5 +1,6 @@
-const storageKey = {
-  location: '_location'
+const KEY = {
+  LOCATION: '_location',
+  CITY: '_city'
 }
 
 /**
@@ -7,7 +8,7 @@ const storageKey = {
  * @param key
  * @returns {*}
  */
-function getStorage(key) {
+function get(key) {
   return wx.getStorageSync(key)
 }
 
@@ -16,12 +17,12 @@ function getStorage(key) {
  * @param key
  * @param value
  */
-function setStorage(key, value) {
+function set(key, value) {
   wx.setStorageSync(key, value)
 }
 
 module.exports = {
-  storageKey,
-  getStorage,
-  setStorage
+  KEY,
+  get,
+  set
 }

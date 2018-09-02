@@ -1,12 +1,10 @@
-import {storageKey, getStorage, setStorage} from './storage'
 import {getAddressByLocation} from './api'
-
 
 /**
  * 获取缓存中的位置
  */
 function getLocationInStorage() {
-  return getStorage(storageKey.location)
+  return wx.storage.get(wx.storage.KEY.LOCATION)
 }
 
 /**
@@ -49,14 +47,14 @@ function getLocation() {
  * @returns {Promise.<TResult>}
  */
 function setLocation(location) {
-  setStorage(storageKey.location, location)
+  wx.storage.set(wx.storage.KEY.LOCATION, location)
   const {latitude, longitude} = location
   return getAddressByLocation(latitude, longitude)
     .then(res => {
       const {status, result} = res
       if (status === 0) {
         const {location, address_component} = result
-        setStorage(storageKey.location, {
+        wx.storage.set(wx.storage.KEY.LOCATION, {
           location,
           address_component,
           date: locationEffective()
