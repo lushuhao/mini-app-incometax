@@ -8,7 +8,7 @@
     <view class="taxWrapper">
       <view class="tax">个税：{{incomeTax}}</view>
       <view class="tax">社保：{{socialTax}}</view>
-      <view class="tax">公积金：{{accumulationTax}}</view>
+      <view class="tax">公积金：{{reserveTax}}</view>
     </view>
   </view>
   <view class="formWrapper">
@@ -18,14 +18,14 @@
     </view>
     <view class="formItem">
       <text>税前工资</text>
-      <input bindinput="bindChange" focus="{{grossWageFocus}}" type="digit" class="formChange" data-name="grossWage"
+      <input bindinput="bindChange" type="digit" class="formChange" data-name="grossWage"
              placeholder="请输入" maxlength="8"
-             value="{{form.grossWage}}"/>
+             value="{{grossWage}}"/>
     </view>
     <view class="formItem">
       <text>起征点</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="threshold" placeholder="请输入"
-             value="{{form.threshold}}"/>
+             value="{{threshold}}"/>
     </view>
   </view>
 
@@ -33,39 +33,39 @@
     <view class="formItem">
       <text>社保基数</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="socialTaxBase" placeholder="不缴纳社保"
-             value="{{form.socialTaxBase}}"/>
+             value="{{socialTaxBase}}"/>
     </view>
     <view class="formItem">
       <text>公积金基数</text>
-      <input bindinput="bindChange" type="digit" class="formChange" data-name="accumulationTaxBase" placeholder="不缴纳公积金"
-             value="{{form.accumulationTaxBase}}"/>
+      <input bindinput="bindChange" type="digit" class="formChange" data-name="reserveTaxBase" placeholder="不缴纳公积金"
+             value="{{reserveTaxBase}}"/>
     </view>
-    <view class="formItem" hidden="{{!form.accumulationTaxBase}}">
+    <view class="formItem" hidden="{{!reserveTaxBase}}">
       <text>公积金比例</text>
-      <picker class="formChange" bindchange="bindChange" value="{{form.accumulationTaxScale}}"
-              range="{{form.accumulationTaxScaleList}}" data-name="accumulationTaxScale">
-        <text>{{form.accumulationTaxScaleList[form.accumulationTaxScale]}}%</text>
+      <picker class="formChange" bindchange="bindChange" value="{{reserveTaxScale}}"
+              range="{{reserveTaxScaleList}}" data-name="reserveTaxScale">
+        <text>{{reserveTaxScaleList[reserveTaxScale]}}%</text>
       </picker>
     </view>
   </view>
 
-  <view class="formWrapper" hidden="{{!form.accumulationTaxBase}}">
+  <view class="formWrapper" hidden="{{!reserveTaxBase}}">
     <view class="formItem">
       <text>是否缴纳补充公积金</text>
-      <switch bindchange="bindChange" checked="{{form.hasAddAccumulationTax}}" data-name="hasAddAccumulationTax" />
+      <switch bindchange="bindChange" checked="{{hasAddReserveTax}}" data-name="hasAddReserveTax" />
     </view>
-    <view wx:if="{{form.hasAddAccumulationTax}}">
+    <view wx:if="{{hasAddReserveTax}}">
       <view class="formItem">
         <text>公积金基数</text>
-        <input bindinput="bindChange" type="digit" class="formChange" data-name="addAccumulationTaxBase"
+        <input bindinput="bindChange" type="digit" class="formChange" data-name="extraReserveTaxBase"
                placeholder="请输入"
-               value="{{form.addAccumulationTaxBase}}"/>
+               value="{{extraReserveTaxBase}}"/>
       </view>
       <view class="formItem">
         <text>公积金比例</text>
-        <picker class="formChange" bindchange="bindChange" value="{{form.addAccumulationTaxScale}}"
-                range="{{form.addAccumulationTaxScaleList}}" data-name="addAccumulationTaxScale">
-          <text>{{form.addAccumulationTaxScaleList[form.addAccumulationTaxScale]}}%</text>
+        <picker class="formChange" bindchange="bindChange" value="{{extraReserveTaxScale}}"
+                range="{{extraReserveTaxScaleList}}" data-name="extraReserveTaxScale">
+          <text>{{extraReserveTaxScaleList[extraReserveTaxScale]}}%</text>
         </picker>
       </view>
     </view>
