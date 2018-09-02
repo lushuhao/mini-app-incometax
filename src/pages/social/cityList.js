@@ -1,4 +1,5 @@
 import cityList from '../../collect/cityList'
+import {setCurrentCity} from '../../module/location'
 
 Page({
   data: {
@@ -16,11 +17,8 @@ Page({
     }, () => {
       this.getShortCutOffset()
     })
-    const self = this
-    wx.getSystemInfo({
-      success(res) {
-        self.windowHeight = res.windowHeight
-      }
+    wx.user.getSystemInfo().then(systemInfo => {
+      this.windowHeight = systemInfo.windowHeight
     })
   },
   onReady() {
@@ -37,6 +35,10 @@ Page({
   },
   onShareAppMessage() {
     // return custom share data when user share.
+  },
+  selectCity(e) {
+    setCurrentCity(e.currentTarget.dataset.city)
+    wx.navigateBack()
   },
   getShortCutOffset() {
     const self = this
@@ -79,7 +81,6 @@ Page({
       const lastY = top - (top - last.bottom) / 2
       const nextY = bottom + (next.top - bottom) / 2
       if (lastY < scrollY && nextY > scrollY) {
-        console.log(top, lastY, scrollY, nextY, bottom)
         this.target = item
       }
     })

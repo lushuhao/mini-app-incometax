@@ -14,7 +14,8 @@
     "App": true,
     "Page": true,
     "Component": true,
-    "wx": true
+    "wx": true,
+    "getCurrentPages": true
   },
   "rules": {
     "indent": [

@@ -82,10 +82,26 @@ function getCurrentAddress() {
       .catch((err) => {
         console.error(err)
       })
-
   })
 }
 
+/**
+ * 获取当前城市
+ */
+function getCurrentCity() {
+  return wx.storage.get(wx.storage.KEY.CITY)
+}
+
+/**
+ * 设置当前城市
+ * @param city
+ */
+function setCurrentCity(city) {
+  return wx.storage.set(wx.storage.KEY.CITY, city)
+}
+
 module.exports = {
-  getCurrentAddress
+  getCurrentAddress,
+  getCurrentCity,
+  setCurrentCity
 }

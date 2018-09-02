@@ -1,5 +1,5 @@
 //index.js
-import {getCurrentAddress} from '../../module/location'
+import {getCurrentAddress, getCurrentCity} from '../../module/location'
 import {mathRound} from '../../utils/util'
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
 const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
@@ -99,19 +99,28 @@ Page({
     taxDetailList: ''
   },
   onLoad() {
-  },
-  onShow() {
     getCurrentAddress()
       .then(location => {
-        const {city = '上海市'} = location.address_component || {}
-        this.setData({city})
+        const {city = '上海'} = location.address_component || {}
+        this.setData({city: city.split(/市/)[0]})
       })
+    this.load = true
+  },
+  onShow() {
+    if (!this.load) {
+      const city = getCurrentCity()
+      city && city.name !== this.data.city && this.setData({city: city.name})
+    }
+    this.load = false
   },
   onShareAppMessage() {
     return {
       title: '上海五险一金及税后工资计算器',
       path: '/pages/index/index'
     }
+  },
+  onCityChange(city) {
+    console.log(city)
   },
   bindChange(e) {
     const name = e.currentTarget.dataset.name
