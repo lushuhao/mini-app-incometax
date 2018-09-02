@@ -55,7 +55,7 @@ Page({
    * @param e
    */
   bindScroll(e) {
-    if (this.data.touch) return
+    if (this.touch) return
     const scrollY = e.detail.scrollTop
     this.viewTargetList.forEach((item, index) => {
       const {top, bottom} = item
@@ -110,7 +110,7 @@ Page({
     })
     this.toView(target)
       .then(() => {
-        this.setData({touch})
+        this.touch = touch
       })
   },
   toView(target) {

@@ -46,7 +46,7 @@ function genAllCityScaleJson() {
     })
 }
 
-// genCityListJson()
+genCityListJson()
 //   .then(() => {
 //     genAllCityBaseJson()
 //   })
