@@ -1,7 +1,10 @@
 //index.js
-import {getCurrentAddress, getCurrentCity} from '../../module/location'
-import {getCityListInStorage, getCityBaseInStorage, getSocialListInStorage} from '../../module/mock'
-import {mathRound} from '../../utils/util'
+import { getCurrentAddress, getCurrentCity } from '../../module/location'
+import cityList from '../../collect/cityList'
+import cityBase from '../../collect/cityBase'
+import socialList from '../../collect/socialList'
+
+import { mathRound } from '../../utils/util'
 
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
 const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
@@ -105,7 +108,7 @@ Page({
       const city = getCurrentCity()
       if (city && city.name !== this.data.city) {
         this.initCity(city.value)
-        this.setData({city: city.name})
+        this.setData({ city: city.name })
       }
     }
     this.load = false
@@ -117,32 +120,25 @@ Page({
     }
   },
   init() {
-    Promise.all([getCityListInStorage(), getCurrentAddress()])
-      .then(res => {
-        const [cityList, location] = res
-        let {city = '上海'} = location.address_component || {}
+    getCurrentAddress()
+      .then(location => {
+        let { city = '上海' } = location.address_component || {}
         city = city.split(/市/)[0]
         // 对象转数组，再合为一维数组
         const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
           return item.name === city
         })
         this.initCity(cityInfo.value)
-        this.setData({city})
+        this.setData({ city })
       })
   },
   // 根据城市初始化五险一金
   initCity(city) {
-    getCityBaseInStorage(city)
-      .then(res => {
-        const {shebao, gongjijin} = res[city]
-        this.social = shebao[0]
-        this.reserve = gongjijin[0]
-        this.initTaxBase()
-        getSocialListInStorage(this.social.code)
-          .then(res => {
-            this.socialScale = res[city]
-          })
-      })
+    const { shebao, gongjijin } = cityBase[city]
+    this.social = shebao[0]
+    this.reserve = gongjijin[0]
+    this.initTaxBase()
+    this.socialScale = socialList[this.social.code]
   },
   // 初始化费用基数
   initTaxBase() {
@@ -167,7 +163,7 @@ Page({
         = this.calculateReserveTaxBase()
     }
     this.setData(data, () => {
-      const {grossWage} = this.data
+      const { grossWage } = this.data
       if (!grossWage || grossWage < 1000) {
         return
       }
@@ -186,8 +182,8 @@ Page({
    * @returns {*}
    */
   calculateTaxBase(taxInfo) {
-    const {grossWage} = this
-    const {minBase, maxBase} = taxInfo
+    const { grossWage } = this
+    const { minBase, maxBase } = taxInfo
     return grossWage <= minBase
       ? minBase
       : grossWage <= maxBase
@@ -196,7 +192,7 @@ Page({
   },
   calculateEarnings() { // 税后
     // let earnings, income, socialTax, reserveTax
-    let {grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase} = this.data
+    let { grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase } = this.data
     const {
       threshold,
       hasAddReserveTax,
@@ -228,7 +224,7 @@ Page({
   },
   calculateTaxDetailList() { // 五险一金详情
     const taxDetailList = genTaxDetailList()
-    const {socialTaxBase} = this.data
+    const { socialTaxBase } = this.data
     // 个人社保
     Object.entries(mySocialTaxInsurance(socialTaxBase)).forEach(([key, value]) => {
       taxDetailList[key].myTax = mathRound(value)
@@ -243,7 +239,7 @@ Page({
     taxDetailList.extraReserve.myTax = taxDetailList.extraReserve.companyTax = this.extraReserveTax
     this.calculateTaxTotal(taxDetailList)
     taxDetailList[0] = taxTitle
-    this.setData({taxDetailList})
+    this.setData({ taxDetailList })
   },
   calculateTaxTotal(taxDetailList) {
     function calculateTaxTypeTotal(taxType) {

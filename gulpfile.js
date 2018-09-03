@@ -118,7 +118,7 @@ gulp.task('wxs', () => {
 })
 
 gulp.task('collect', () => {
-  return gulp.src(`${router}/*.json`)
+  return gulp.src([`${router}/*.json`, `${mock}/**/*.json`])
     .pipe(through.obj(function (file, enc, cb) {
       file.contents = Buffer.concat([Buffer.from('module.exports = '), file.contents])
       this.push(file)

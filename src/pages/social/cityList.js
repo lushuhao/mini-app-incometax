@@ -1,5 +1,5 @@
-import {setCurrentCity} from '../../module/location'
-import {getCityListInStorage} from '../../module/mock'
+import { setCurrentCity } from '../../module/location'
+import cityList from '../../collect/cityList'
 
 Page({
   data: {
@@ -32,15 +32,12 @@ Page({
     // return custom share data when user share.
   },
   getCityList() {
-    getCityListInStorage()
-      .then(cityList => {
-        this.setData({
-          cityList,
-          cityKeyList: Object.keys(cityList)
-        }, () => {
-          this.getShortCutOffset()
-        })
-      })
+    this.setData({
+      cityList,
+      cityKeyList: Object.keys(cityList)
+    }, () => {
+      this.getShortCutOffset()
+    })
   },
   selectCity(e) {
     setCurrentCity(e.currentTarget.dataset.city)
@@ -64,7 +61,7 @@ Page({
     if (this.touch) return
     const scrollY = e.detail.scrollTop
     this.viewTargetList.forEach((item, index) => {
-      const {top, bottom} = item
+      const { top, bottom } = item
       /**
        * 可视外区域跳过循环
        * target不变跳过循环
@@ -110,7 +107,7 @@ Page({
     this.calculateTouchTarget(e.changedTouches, false)
   },
   calculateTouchTarget(touches, touch = true) {
-    const {clientY} = touches[0]
+    const { clientY } = touches[0]
     const target = this.targetList.find(y => {
       return y.top < clientY && y.bottom > clientY
     })
@@ -121,7 +118,7 @@ Page({
   },
   toView(target) {
     return new Promise(resolve => {
-      const {key} = target && target.dataset || ''
+      const { key } = target && target.dataset || ''
       if (key &&
         key !== this.data.toCityKey) {
         const toTarget = this.viewTargetList.find(item => {

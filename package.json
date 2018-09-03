@@ -34,7 +34,7 @@
     "@babel/preset-env": "^7.0.0",
     "ansi-colors": "^3.0.5",
     "del": "^3.0.0",
-    "eslint": "^5.4.0",
+    "eslint": "^5.5.0",
     "fancy-log": "^1.3.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^8.0.0",
@@ -43,6 +43,7 @@
     "gulp-if": "^2.0.2",
     "gulp-jsonminify": "^1.1.0",
     "gulp-postcss": "^7.0.0",
+    "gulp-rename": "latest",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.1",
@@ -51,7 +52,6 @@
     "postcss-px2rpx": "0.0.4",
     "run-sequence": "^2.2.1",
     "stream-combiner2": "^1.1.1",
-    "through2": "^2.0.3",
-    "gulp-rename": "latest"
+    "through2": "^2.0.3"
   }
 }
