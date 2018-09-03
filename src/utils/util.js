@@ -53,10 +53,20 @@ const debounce = (cb, delay = 100, context) => {
     cb.call(context)
   }, delay)
 }
+/**
+ * 取出字符串中的数字
+ * @desc 不包括0
+ * @param str
+ * @returns Number
+ */
+const splitString2Number = (str) => {
+  return str.split(/(\d+)/).map(item => Number(item)).find(item => item)
+}
 
 module.exports = {
   formatTime,
   mathRound,
   throttle,
   debounce,
+  splitString2Number
 }

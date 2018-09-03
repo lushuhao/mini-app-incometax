@@ -1,7 +1,7 @@
 //index.js
 import {getCurrentAddress, getCurrentCity} from '../../module/location'
 import {getCityListInStorage, getCityBaseInStorage, getSocialListInStorage} from '../../module/mock'
-import {mathRound} from '../../utils/util'
+import {mathRound, splitString2Number} from '../../utils/util'
 
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
 const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
@@ -82,18 +82,17 @@ Page({
     incomeTax: 0,
     socialTax: 0,
     reserveTax: 0,
-    grossWage: '',
-    threshold: 3500,
+    grossWage: '', // 税前工资
+    threshold: 3500, // 个税起征点
     hasSocialTax: false,
     socialTaxBase: '', // 社保基数
     hasReserveTax: false,
     reserveTaxBase: '', // 公积金基数
-    reserveTaxScale: 2,
-    reserveTaxScaleList: [5, 6, 7, 8, 9, 10, 11, 12],
+    reserveTaxScaleIndex: 0,
+    reserveTaxScaleList: '',
     hasAddReserveTax: false,
     extraReserveTaxBase: '', // 补充公积金基数
-    extraReserveTaxScale: 0,
-    extraReserveTaxScaleList: [1, 2, 3, 4, 5],
+    extraReserveTaxScale: '',
     taxDetailList: ''
   },
   onLoad() {
@@ -132,16 +131,15 @@ Page({
   },
   // 根据城市初始化五险一金
   initCity(city) {
-    getCityBaseInStorage(city)
+    Promise.all([getCityBaseInStorage(), getSocialListInStorage()])
       .then(res => {
-        const {shebao, gongjijin} = res[city]
+        const [cityBase, socialList] = res
+        this.socialScale = socialList[city]
+        const {shebao, gongjijin} = cityBase[city]
         this.social = shebao[0]
-        this.reserve = gongjijin[0]
+        this.reserve = gongjijin[this.data.reserveTaxScaleIndex]
         this.initTaxBase()
-        getSocialListInStorage(this.social.code)
-          .then(res => {
-            this.socialScale = res[city]
-          })
+        this.setData({reserveTaxScaleList: gongjijin.map(item => item.alias)})
       })
   },
   // 初始化费用基数
@@ -186,7 +184,7 @@ Page({
    * @returns {*}
    */
   calculateTaxBase(taxInfo) {
-    const {grossWage} = this
+    const {grossWage = 0} = this
     const {minBase, maxBase} = taxInfo
     return grossWage <= minBase
       ? minBase
@@ -194,32 +192,31 @@ Page({
         ? grossWage
         : maxBase
   },
-  calculateEarnings() { // 税后
-    // let earnings, income, socialTax, reserveTax
-    let {grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase} = this.data
+  /**
+   * 计算税后工资
+   * @desc 税前工资，先减去公积金和社保，再减去起征点，最后按比例纳税
+   */
+  calculateEarnings() {
+    let earnings
     const {
-      threshold,
-      hasAddReserveTax,
+      grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase, threshold, hasAddReserveTax,
     } = this.data
-    socialTaxBase = socialTaxBase || 0
-    reserveTaxBase = reserveTaxBase || 0
-    extraReserveTaxBase = extraReserveTaxBase || 0
     this.calculateSocialTax(socialTaxBase) // 社保
-    grossWage = grossWage - this.mySocialTaxInsurance
+    earnings = grossWage - this.mySocialTaxInsurance
     this.calculateReserveTax(reserveTaxBase) // 公积金
-    grossWage = grossWage - this.reserveTax
+    earnings = grossWage - this.reserveTax
     if (hasAddReserveTax) { // 补充公积金
       this.calculateAddReserveTax(extraReserveTaxBase)
-      grossWage = grossWage - this.extraReserveTax
+      earnings = grossWage - this.extraReserveTax
     }
-    if (grossWage > threshold) {
-      this.calculateIncomeTax(grossWage - threshold)
-      grossWage = grossWage - this.incomeTaxTotal
+    if (earnings > threshold) {
+      this.calculateIncomeTax(earnings - threshold)
+      earnings = grossWage - this.incomeTaxTotal
     } else {
       this.incomeTaxTotal = 0
     }
     this.setData({
-      earnings: mathRound(grossWage),
+      earnings: mathRound(earnings),
       incomeTax: mathRound(this.incomeTaxTotal),
       socialTax: mathRound(this.mySocialTaxInsurance),
       reserveTax: this.reserveTax
@@ -263,20 +260,24 @@ Page({
     const companySocialTaxInsuranceList = Object.values(companySocialTaxInsurance(socialTaxBase))
     this.companySocialTaxInsurance = companySocialTaxInsuranceList.reduce((total, item) => (total += item))
   },
-  calculateReserveTax(reserveTaxBase) { // 公积金
+  /**
+   * 计算公积金
+   * @param reserveTaxBase
+   */
+  calculateReserveTax(reserveTaxBase) {
     const {
-      reserveTaxScale,
+      reserveTaxScaleIndex,
       reserveTaxScaleList
     } = this.data
-    this.reserveTax = reserveTaxBase * reserveTaxScaleList[reserveTaxScale] * 0.01
+    const reserveTaxScale = splitString2Number(reserveTaxScaleList[reserveTaxScaleIndex])
+    this.reserveTax = reserveTaxBase * reserveTaxScale * 0.01
     this.reserveTax = mathRound(Math.ceil(this.reserveTax))
   },
   calculateAddReserveTax(extraReserveTaxBase) { // 补充公积金
     const {
-      extraReserveTaxScale,
-      extraReserveTaxScaleList
+      extraReserveTaxScale
     } = this.data
-    this.extraReserveTax = extraReserveTaxBase * extraReserveTaxScaleList[extraReserveTaxScale] * 0.01
+    this.extraReserveTax = extraReserveTaxBase * extraReserveTaxScale * 0.01
     this.extraReserveTax = mathRound(this.extraReserveTax)
   },
   calculateIncomeTax(grossWage) { // 个人所得税

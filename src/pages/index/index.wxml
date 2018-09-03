@@ -42,9 +42,9 @@
     </view>
     <view class="formItem" hidden="{{!reserveTaxBase}}">
       <text>公积金比例</text>
-      <picker class="formChange" bindchange="bindChange" value="{{reserveTaxScale}}"
-              range="{{reserveTaxScaleList}}" data-name="reserveTaxScale">
-        <text>{{reserveTaxScaleList[reserveTaxScale]}}%</text>
+      <picker class="formChange" bindchange="bindChange" value="{{reserveTaxScaleIndex}}"
+              range="{{reserveTaxScaleList}}" data-name="reserveTaxScaleIndex">
+        <text>{{reserveTaxScaleList[reserveTaxScaleIndex]}}</text>
       </picker>
     </view>
   </view>
@@ -63,10 +63,14 @@
       </view>
       <view class="formItem">
         <text>公积金比例</text>
-        <picker class="formChange" bindchange="bindChange" value="{{extraReserveTaxScale}}"
-                range="{{extraReserveTaxScaleList}}" data-name="extraReserveTaxScale">
-          <text>{{extraReserveTaxScaleList[extraReserveTaxScale]}}%</text>
-        </picker>
+        <input class="formChange"
+               type="number"
+               maxlength="2"
+               bindchange="bindChange"
+               value="{{extraReserveTaxScale}}"
+               placeholder="请输入补充公积金比例"
+               data-name="extraReserveTaxScale">
+        </input>
       </view>
     </view>
   </view>
@@ -78,5 +82,7 @@
       <text>{{item.companyTax}}</text>
     </view>
   </view>
-  <feedback/>
+  <view class="feedback">
+    <feedback />
+  </view>
 </view>
