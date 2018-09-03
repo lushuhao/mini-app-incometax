@@ -1,3 +1,5 @@
+import {debounce} from '../../utils/util'
+
 Component({
   behaviors: [],
   properties: {
@@ -12,16 +14,17 @@ Component({
     showToast: false
   },
   methods: {
+    hiddenToast() {
+      this.setData({
+        showToast: false
+      })
+    },
     toastHandle() {
+      !this.data.showToast &&
       this.setData({
         showToast: true
       })
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.setData({
-          showToast: false
-        })
-      }, 500)
+      debounce(this.hiddenToast, 500, this)
     }
   }
 })

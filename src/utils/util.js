@@ -23,7 +23,40 @@ const mathRound = (number, precision = 2) => {
   return number
 }
 
+/**
+ * 节流
+ * @desc 通过对象是引用的性质，将标志位赋值到外层
+ * @param cb
+ * @param delay
+ * @param context
+ * @param args
+ */
+const throttle = (cb, delay = 1000 / 60, context, ...args) => {
+  if (cb.run) return
+  cb.run = true
+  cb.apply(context, args)
+  setTimeout(() => {
+    cb.run = false
+  }, delay)
+}
+
+/**
+ * 去抖
+ * @desc 通过对象是引用的性质，将tid赋值到外层
+ * @param cb
+ * @param delay
+ * @param context
+ */
+const debounce = (cb, delay = 100, context) => {
+  clearTimeout(cb.tid)
+  cb.tid = setTimeout(() => {
+    cb.call(context)
+  }, delay)
+}
+
 module.exports = {
   formatTime,
-  mathRound
+  mathRound,
+  throttle,
+  debounce,
 }
