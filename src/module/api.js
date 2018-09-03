@@ -1,9 +1,11 @@
+const mock = 'https://api.lushuhao.cn'
+
 const apiUrls = {
   geoCoder: 'https://apis.map.qq.com/ws/geocoder/v1/?location=',
-  preMock: 'https://wx.lushuhao.xyz',
-  cityList: 'https://wx.lushuhao.xyz/mock/cityList.json',
-  cityBase: 'https://wx.lushuhao.xyz/mock/cityBase.json',
-  socialList: 'https://wx.lushuhao.xyz/mock/socialList.json',
+  preMock: mock,
+  cityList: `${mock}/mock/cityList.json`,
+  cityBase: `${mock}/mock/cityBase.json`,
+  socialList: `${mock}/mock/socialList.json`,
 }
 
 /**
@@ -16,9 +18,11 @@ function fetch(opts) {
     wx.request({
       ...opts,
       success(res) {
-        resolve(res.data)
+        if (res.statusCode === 200) {
+          resolve(res.data)
+        }
       },
-      fail(err) {
+      complete(err) {
         reject(err)
       }
     })
