@@ -165,7 +165,7 @@ gulp.task('dev', () => {
 })
 
 gulp.task('build', () => {
-  runSequence('projectConfig', 'clean', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], () => {
+  runSequence('projectConfig', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], () => {
     log(colors.cyan(`所有文件打包到${dist}`), colors.green('ok'))
   })
 })

@@ -76,8 +76,7 @@
                bindinput="bindChange"
                value="{{extraReserveTaxScale}}"
                placeholder="请输入补充公积金比例"
-               data-name="extraReserveTaxScale">
-        </input>
+               data-name="extraReserveTaxScale" />
         <i class="iconfont icon-arrows-right" />
       </view>
     </view>
@@ -87,11 +86,10 @@
     <view class="taxItem"
           wx:for="{{taxDetailList}}"
           wx:key="{{item.name}}"
-          wx:if="{{item.myTax || item.companyTax}}"
-    >
+          wx:if="{{item.myTax || item.companyTax}}">
       <text>{{item.name}}</text>
-      <text>{{item.myTax}}</text>
-      <text>{{item.companyTax}}</text>
+      <text class="tax">{{item.myTax}}</text>
+      <text class="tax">{{item.companyTax}}</text>
     </view>
   </view>
   <view class="feedback">
