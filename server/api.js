@@ -53,6 +53,7 @@ function getScaleBySocial(social) {
     const social = {myScale: {}, companyScale: {}}
     scocialItems.forEach(item => {
       const key = socialInsuranceType[item.itemName]
+      if (!key) return
       /**
        * 无百分比的，取固定金额
        * 医疗保险与个人医疗保险重复，取其中有值的进行赋值
