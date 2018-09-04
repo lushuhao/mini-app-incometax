@@ -1,23 +1,11 @@
 //index.js
-import {getCurrentAddress, getCurrentCity} from '../../module/location'
-import {getCityListInStorage, getCityBaseInStorage, getSocialListInStorage} from '../../module/mock'
-import {mathRound, splitString2Number} from '../../utils/util'
+import { getCurrentAddress, getCurrentCity } from '../../module/location'
+import { getCityListInStorage, getCityBaseInStorage, getSocialListInStorage } from '../../module/mock'
+import { mathRound, splitString2Number } from '../../utils/util'
 
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
 const incomeTaxScaleList = [0, 0.03, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45]
 
-const mySocialTaxInsurance = (socialTaxBase) => ({
-  endowment: socialTaxBase * 0.08,
-  medical: socialTaxBase * 0.02,
-  unemployment: socialTaxBase * 0.005,
-})
-const companySocialTaxInsurance = (socialTaxBase) => ({
-  endowment: socialTaxBase * 0.2,
-  medical: socialTaxBase * 0.095,
-  unemployment: socialTaxBase * 0.005,
-  employment: socialTaxBase * 0.001,
-  birth: socialTaxBase * 0.01
-})
 const genTaxDetailList = () => ({
   endowment: {
     name: '养老保险',
@@ -28,6 +16,13 @@ const genTaxDetailList = () => ({
   },
   medical: {
     name: '医疗保险',
+    myTax: '',
+    myTaxScale: 0.02,
+    companyTax: '',
+    companyTaxScale: 0.095
+  },
+  seriousDiseases: {
+    name: '大病医疗保险',
     myTax: '',
     myTaxScale: 0.02,
     companyTax: '',
@@ -99,12 +94,20 @@ Page({
     this.init()
     this.load = true
   },
+  /**
+   * @todo 选择城市，上一次计算过，就重新计算
+   */
   onShow() {
     if (!this.load) {
       const city = getCurrentCity()
       if (city && city.name !== this.data.city) {
         this.initCity(city.value)
-        this.setData({city: city.name})
+          .then(() => {
+            if (this.data.taxDetailList) {
+              this.calculateEarnings()
+            }
+          })
+        this.setData({ city: city.name })
       }
     }
     this.load = false
@@ -119,37 +122,46 @@ Page({
     Promise.all([getCityListInStorage(), getCurrentAddress()])
       .then(res => {
         const [cityList, location] = res
-        let {city = '上海'} = location.address_component || {}
+        let { city = '上海' } = location.address_component || {}
         city = city.split(/市/)[0]
         // 对象转数组，再合为一维数组
         const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
           return item.name === city
         })
         this.initCity(cityInfo.value)
-        this.setData({city})
+        this.setData({ city })
       })
   },
-  // 根据城市初始化五险一金
+  /**
+   * 根据城市初始化五险一金
+   * @param city
+   * @returns {Promise.<TResult>}
+   */
   initCity(city) {
-    Promise.all([getCityBaseInStorage(), getSocialListInStorage()])
+    return Promise.all([getCityBaseInStorage(), getSocialListInStorage()])
       .then(res => {
         const [cityBase, socialList] = res
         this.socialScale = socialList[city]
-        const {shebao, gongjijin} = cityBase[city]
+        const { shebao, gongjijin } = cityBase[city]
         this.social = shebao[0]
-        this.reserve = gongjijin[this.data.reserveTaxScaleIndex]
-        this.initTaxBase()
-        this.setData({reserveTaxScaleList: gongjijin.map(item => item.alias)})
+        this.reserve = gongjijin[0]
+        const data = {
+          ...this.initTaxBase(),
+          reserveTaxScaleList: gongjijin.map(item => item.alias)
+        }
+        this.setData(data, () => {
+          return Promise.resolve(null)
+        })
       })
   },
   // 初始化费用基数
   initTaxBase() {
     const reserveTaxBase = this.calculateReserveTaxBase()
-    this.setData({
+    return {
       socialTaxBase: this.calculateSocialTaxBase(),
       reserveTaxBase,
       extraReserveTaxBase: reserveTaxBase
-    })
+    }
   },
   bindChange(e) {
     const name = e.currentTarget.dataset.name
@@ -165,7 +177,7 @@ Page({
         = this.calculateReserveTaxBase()
     }
     this.setData(data, () => {
-      const {grossWage} = this.data
+      const { grossWage } = this.data
       if (!grossWage || grossWage < 1000) {
         return
       }
@@ -184,8 +196,8 @@ Page({
    * @returns {*}
    */
   calculateTaxBase(taxInfo) {
-    const {grossWage = 0} = this
-    const {minBase, maxBase} = taxInfo
+    const { grossWage = 0 } = this
+    const { minBase, maxBase } = taxInfo
     return grossWage <= minBase
       ? minBase
       : grossWage <= maxBase
@@ -199,19 +211,17 @@ Page({
   calculateEarnings() {
     let earnings
     const {
-      grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase, threshold, hasAddReserveTax,
+      grossWage, socialTaxBase, reserveTaxBase, extraReserveTaxBase, threshold,
     } = this.data
     this.calculateSocialTax(socialTaxBase) // 社保
     earnings = grossWage - this.mySocialTaxInsurance
     this.calculateReserveTax(reserveTaxBase) // 公积金
-    earnings = grossWage - this.reserveTax
-    if (hasAddReserveTax) { // 补充公积金
-      this.calculateAddReserveTax(extraReserveTaxBase)
-      earnings = grossWage - this.extraReserveTax
-    }
+    earnings -= this.reserveTax
+    this.calculateAddReserveTax(extraReserveTaxBase) // 补充公积金
+    earnings -= this.extraReserveTax
     if (earnings > threshold) {
       this.calculateIncomeTax(earnings - threshold)
-      earnings = grossWage - this.incomeTaxTotal
+      earnings -= this.incomeTaxTotal
     } else {
       this.incomeTaxTotal = 0
     }
@@ -223,24 +233,35 @@ Page({
     })
     this.calculateTaxDetailList()
   },
+  /**
+   * 计算社保详情
+   * @param taxDetailList
+   * @param socialTaxList
+   * @param taxType
+   */
+  calculateSocialTaxDetailList(taxDetailList, socialTaxList, taxType) {
+    Object.entries(socialTaxList).forEach(([key, value]) => {
+      taxDetailList[key] &&
+      (taxDetailList[key][taxType] = mathRound(value))
+    })
+  },
+  /**
+   * 计算五险一金详情，生成表格
+   * @desc 个人和公司分别计算
+   */
   calculateTaxDetailList() { // 五险一金详情
     const taxDetailList = genTaxDetailList()
-    const {socialTaxBase} = this.data
     // 个人社保
-    Object.entries(mySocialTaxInsurance(socialTaxBase)).forEach(([key, value]) => {
-      taxDetailList[key].myTax = mathRound(value)
-    })
+    this.calculateSocialTaxDetailList(taxDetailList, this.mySocialTaxList, 'myTax')
     // 公司社保
-    Object.entries(companySocialTaxInsurance(socialTaxBase)).forEach(([key, value]) => {
-      taxDetailList[key].companyTax = mathRound(value)
-    })
+    this.calculateSocialTaxDetailList(taxDetailList, this.companySocialTaxList, 'companyTax')
     // 公积金
     taxDetailList.reserve.myTax = taxDetailList.reserve.companyTax = this.reserveTax
     // 补充公积金
     taxDetailList.extraReserve.myTax = taxDetailList.extraReserve.companyTax = this.extraReserveTax
     this.calculateTaxTotal(taxDetailList)
     taxDetailList[0] = taxTitle
-    this.setData({taxDetailList})
+    this.setData({ taxDetailList })
   },
   calculateTaxTotal(taxDetailList) {
     function calculateTaxTypeTotal(taxType) {
@@ -254,14 +275,57 @@ Page({
     taxDetailList.total.myTax = mathRound(calculateTaxTypeTotal('myTax'))
     taxDetailList.total.companyTax = mathRound(calculateTaxTypeTotal('companyTax'))
   },
-  calculateSocialTax(socialTaxBase) { // 社保
-    const mySocialTaxInsuranceList = Object.values(mySocialTaxInsurance(socialTaxBase))
-    this.mySocialTaxInsurance = mySocialTaxInsuranceList.reduce((total, item) => (total += item))
-    const companySocialTaxInsuranceList = Object.values(companySocialTaxInsurance(socialTaxBase))
-    this.companySocialTaxInsurance = companySocialTaxInsuranceList.reduce((total, item) => (total += item))
+  /**
+   * 社保基数*百分比
+   * @param socialTaxBase
+   * @param scale
+   * @returns {{}}
+   */
+  calculateSocialTaxInsurance(socialTaxBase, scale) {
+    const socialTaxInsurance = {}
+    Object.entries(scale).map(([k, v]) => {
+      // 没有%，就是固定金额
+      if (typeof v === 'string' && v.includes('%')) {
+        socialTaxInsurance[k] = splitString2Number(v) * socialTaxBase * 0.01
+      } else {
+        socialTaxInsurance[k] = v
+      }
+    })
+    return socialTaxInsurance
   },
   /**
+   * 生成个人和公司每一项社保费用
+   * @param socialTaxBase
+   * @returns {{mySocialTaxList: (*|{}), companySocialTaxList: (*|{})}}
+   */
+  genSocialTaxList(socialTaxBase) {
+    const { myScale, companyScale } = this.socialScale
+    this.mySocialTaxList = this.calculateSocialTaxInsurance(socialTaxBase, myScale)
+    this.companySocialTaxList = this.calculateSocialTaxInsurance(socialTaxBase, companyScale)
+  },
+  /**
+   *
+   * @param socialTaxList
+   * @returns {*}
+   */
+  genTotalSocialTax(socialTaxList) {
+    return Object.values(socialTaxList).reduce((total, item) => (total += item))
+  },
+  /**
+   * 计算社保
+   * @param socialTaxBase
+   * @desc 设置个人和公司社保费用
+   */
+  calculateSocialTax(socialTaxBase) { // 社保
+    this.genSocialTaxList(socialTaxBase)
+    this.mySocialTaxInsurance = this.genTotalSocialTax(this.mySocialTaxList)
+
+    this.companySocialTaxInsurance = this.genTotalSocialTax(this.companySocialTaxList)
+  }
+  ,
+  /**
    * 计算公积金
+   * @desc 基数*比例
    * @param reserveTaxBase
    */
   calculateReserveTax(reserveTaxBase) {
@@ -273,13 +337,23 @@ Page({
     this.reserveTax = reserveTaxBase * reserveTaxScale * 0.01
     this.reserveTax = mathRound(Math.ceil(this.reserveTax))
   },
-  calculateAddReserveTax(extraReserveTaxBase) { // 补充公积金
+  /**
+   * 计算补充公积金
+   * @desc 基数*比例
+   * @param extraReserveTaxBase
+   */
+  calculateAddReserveTax(extraReserveTaxBase) {
     const {
-      extraReserveTaxScale
+      extraReserveTaxScale,
+      hasAddReserveTax
     } = this.data
+    if (!hasAddReserveTax) {
+      return this.extraReserveTax = ''
+    }
     this.extraReserveTax = extraReserveTaxBase * extraReserveTaxScale * 0.01
     this.extraReserveTax = mathRound(this.extraReserveTax)
-  },
+  }
+  ,
   calculateIncomeTax(grossWage) { // 个人所得税
     let taxIndex = incomeTaxList.findIndex((tax) => {
       return tax > grossWage
@@ -291,7 +365,8 @@ Page({
       incomeTaxTotal = incomeTaxTotal + (incomeTaxList[taxIndex] - incomeTaxList[taxIndex - 1]) * incomeTaxScaleList[taxIndex]
     }
     this.incomeTaxTotal = incomeTaxTotal
-  },
+  }
+  ,
   changeCity() {
     wx.safeNavigateTo(wx.routers.social_cityList)
   }

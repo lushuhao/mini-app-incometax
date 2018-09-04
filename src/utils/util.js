@@ -14,13 +14,19 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+/**
+ * 对数字四舍五入，并保留小数
+ * @param number
+ * @param precision
+ * @returns {*}
+ */
 const mathRound = (number, precision = 2) => {
   if (typeof number !== 'number') {
-    return 0
+    number = 0
+  } else {
+    number = (Math.round(number * 10 ** precision) / 10 ** precision)
   }
-  number = (Math.round(number * 10 ** precision) / 10 ** precision).toFixed(precision)
-
-  return number
+  return number.toFixed(precision)
 }
 
 /**
@@ -60,7 +66,8 @@ const debounce = (cb, delay = 100, context) => {
  * @returns Number
  */
 const splitString2Number = (str) => {
-  return str.split(/(\d+)/).map(item => Number(item)).find(item => item)
+  if (typeof str !== 'string') return Number(str) || 0
+  return str.split(/(\d+\.\d+)|(\d+)/).map(item => Number(item)).find(item => item)
 }
 
 module.exports = {
