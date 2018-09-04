@@ -1,6 +1,6 @@
 const path = require('path')
 
-const dataDirPath = path.resolve(__dirname, '../mock/data')
+const dataDirPath = path.resolve(__dirname, '../mock')
 
 const dataName = {
   city: 'cityList.json',

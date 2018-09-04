@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "工资社保计算器",
   "usingComponents": {
-    "feedback": "/components/feedback/feedback"
+    "feedback": "/components/feedback/feedback",
+    "formItem": "/components/formItem/formItem"
   }
 }

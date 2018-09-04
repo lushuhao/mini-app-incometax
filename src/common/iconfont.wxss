@@ -1,0 +1,16 @@
+@font-face {
+    font-family: 'iconfont';
+    src: url('iconfont.ttf') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+    font-weight: normal;
+    font-style: normal;
+}
+
+.iconfont {
+    font-family:'iconfont' !important;
+    font-size:32rpx;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrows-right:before { content: "\e64c"; }

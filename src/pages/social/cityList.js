@@ -1,5 +1,6 @@
 import { setCurrentCity } from '../../module/location'
 import cityList from '../../collect/cityList'
+import { throttle } from '../../utils/util'
 
 Page({
   data: {
@@ -57,7 +58,7 @@ Page({
    * @description touch事件触发时，跳过
    * @param e
    */
-  bindScroll(e) {
+  scroll(e) {
     if (this.touch) return
     const scrollY = e.detail.scrollTop
     this.viewTargetList.forEach((item, index) => {
@@ -94,6 +95,13 @@ Page({
       toCityKey: this.target.id
     })
   },
+  /**
+   * dom绑定的scroll事件，进行节流
+   * @param e
+   */
+  bindScroll(e) {
+    throttle(this.scroll, undefined, this, e)
+  },
   touchStart(e) {
     this.setData({
       showToast: true
@@ -101,7 +109,7 @@ Page({
     this.calculateTouchTarget(e.touches)
   },
   touchMove(e) {
-    this.calculateTouchTarget(e.touches)
+    throttle(this.calculateTouchTarget, undefined, this, e.touches)
   },
   touchEnd(e) {
     this.calculateTouchTarget(e.changedTouches, false)
