@@ -65,8 +65,13 @@ page {
       border-bottom: 1px solid #eee;
     }
 
+    text {
+      white-space: nowrap;
+      width: 20%;
+    }
+
     .formChange {
-      flex: 0 70%;
+      flex: 0 50%;
       
       &.city{
         color: #333;

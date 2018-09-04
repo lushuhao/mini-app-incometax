@@ -10,30 +10,22 @@ const genTaxDetailList = () => ({
   endowment: {
     name: '养老保险',
     myTax: '',
-    myTaxScale: 0.08,
     companyTax: '',
-    companyTaxScale: 0.2
   },
   medical: {
     name: '医疗保险',
     myTax: '',
-    myTaxScale: 0.02,
     companyTax: '',
-    companyTaxScale: 0.095
   },
   seriousDiseases: {
     name: '大病医疗保险',
     myTax: '',
-    myTaxScale: 0.02,
     companyTax: '',
-    companyTaxScale: 0.095
   },
   unemployment: {
     name: '失业保险',
     myTax: '',
-    myTaxScale: 0.005,
     companyTax: '',
-    companyTaxScale: 0.005
   },
   reserve: {
     name: '住房公积金',
@@ -49,15 +41,11 @@ const genTaxDetailList = () => ({
     name: '工伤保险',
     myTax: '',
     companyTax: '',
-    companyTaxScale: 0.001,
-    hiddenMyTax: true
   },
   birth: {
     name: '生育保险',
     myTax: '',
     companyTax: '',
-    companyTaxScale: 0.01,
-    hiddenMyTax: true
   },
   total: {
     name: '共计支出',
@@ -70,6 +58,7 @@ const taxTitle = {
   myTax: '个人应缴部分',
   companyTax: '公司应缴部分'
 }
+
 Page({
   data: {
     city: '', // 当前定位城市

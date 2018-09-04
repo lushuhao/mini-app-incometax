@@ -15,17 +15,20 @@
     <view class="formItem">
       <text>当前城市</text>
       <view class="formChange city" bindtap="changeCity">{{city}}</view>
+      <i class="iconfont icon-arrows-right" />
     </view>
     <view class="formItem">
       <text>税前工资</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="grossWage"
              placeholder="请输入" maxlength="8"
              value="{{grossWage}}"/>
+      <i class="iconfont icon-arrows-right" />
     </view>
     <view class="formItem">
       <text>起征点</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="threshold" placeholder="请输入"
              value="{{threshold}}"/>
+      <i class="iconfont icon-arrows-right" />
     </view>
   </view>
 
@@ -34,11 +37,13 @@
       <text>社保基数</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="socialTaxBase" placeholder="不缴纳社保"
              value="{{socialTaxBase}}"/>
+      <i class="iconfont icon-arrows-right" />
     </view>
     <view class="formItem">
       <text>公积金基数</text>
       <input bindinput="bindChange" type="digit" class="formChange" data-name="reserveTaxBase" placeholder="不缴纳公积金"
              value="{{reserveTaxBase}}"/>
+      <i class="iconfont icon-arrows-right" />
     </view>
     <view class="formItem" hidden="{{!reserveTaxBase}}">
       <text>公积金比例</text>
@@ -46,6 +51,7 @@
               range="{{reserveTaxScaleList}}" data-name="reserveTaxScaleIndex">
         <text>{{reserveTaxScaleList[reserveTaxScaleIndex]}}</text>
       </picker>
+      <i class="iconfont icon-arrows-right" />
     </view>
   </view>
 
@@ -60,6 +66,7 @@
         <input bindinput="bindChange" type="digit" class="formChange" data-name="extraReserveTaxBase"
                placeholder="请输入"
                value="{{extraReserveTaxBase}}"/>
+        <i class="iconfont icon-arrows-right" />
       </view>
       <view class="formItem">
         <text>公积金比例</text>
@@ -71,6 +78,7 @@
                placeholder="请输入补充公积金比例"
                data-name="extraReserveTaxScale">
         </input>
+        <i class="iconfont icon-arrows-right" />
       </view>
     </view>
   </view>
