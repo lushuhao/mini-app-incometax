@@ -1,15 +1,18 @@
-import { setCurrentCity } from '../../module/location'
+import { setCurrentCity, getLocationInStorage, getCurrentAddress } from '../../module/location'
 import cityList from '../../collect/cityList'
 import { throttle } from '../../utils/util'
+
+const hotCity = ['北京', '上海', '广州', '深圳', '天津', '南京', '杭州', '武汉', '重庆']
 
 Page({
   data: {
     cityList: [],
     cityKeyList: [], // 城市首字母列表
     scrollTop: 0,
-    toCityKey: 'a', // 滚动位置的城市首字母
+    toCityKey: '', // 滚动位置的城市首字母
     showToast: false,
     touch: false, // touch事件触发
+    hasAuth: true, // 是否授权定位
   },
   onLoad() {
     this.getCityList()
@@ -17,32 +20,72 @@ Page({
       this.windowHeight = systemInfo.windowHeight
     })
   },
-  onReady() {
-    // Do something when page ready.
-  },
-  onShow() {
-    // Do something when page show.
-  },
-  onHide() {
-    // Do something when page hide.
-  },
-  onUnload() {
-    // Do something when page close.
-  },
-  onShareAppMessage() {
-    // return custom share data when user share.
-  },
   getCityList() {
+    const list = {
+      '定': this.setLocationCity(),
+      '热': this.setHotCity(),
+      ...cityList
+    }
     this.setData({
-      cityList,
-      cityKeyList: Object.keys(cityList)
+      cityList: list,
+      cityKeyList: Object.keys(list)
     }, () => {
       this.getShortCutOffset()
     })
   },
+  setLocationCity(location) {
+    location = location || getLocationInStorage()
+    const { city } = location && location.address_component
+    if (city) {
+      return [this.getCityInfo(city)]
+    } else {
+      const self = this
+      wx.getSetting({
+        success(res) {
+          const hasAuth = !!res.authSetting['scope.userLocation']
+          self.setData({
+            hasAuth
+          })
+        }
+      })
+    }
+    return [{ name: '定位失败' }]
+  },
+  setHotCity() {
+    return hotCity.map(city => {
+      return this.getCityInfo(city)
+    })
+  },
+  /**
+   * 通过cityName获取详细
+   * @param city
+   * @returns {T}
+   */
+  getCityInfo(city) {
+    if (!this.list) {
+      const keyList = Object.values(cityList)
+      this.list = [].concat(...keyList)
+    }
+    return this.list.find(item => city.includes(item.name))
+  },
   selectCity(e) {
-    setCurrentCity(e.currentTarget.dataset.city)
+    const city = e.currentTarget.dataset.city
+    if (city.name === '定位失败') return
+    setCurrentCity(city)
     wx.navigateBack()
+  },
+  openSetting(res) {
+    const { detail, type } = res
+    if (type !== 'opensetting') return
+    const hasAuth = detail.authSetting['scope.userLocation'] || ''
+    if (hasAuth) {
+      getCurrentAddress().then((location) => {
+        this.setData({
+          'cityList.定': this.setLocationCity(location),
+          hasAuth
+        })
+      })
+    }
   },
   getShortCutOffset() {
     const self = this

@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "切换城市",
+  "navigationBarBackgroundColor": "#ffffff",
   "disableScroll": true,
   "usingComponents": {
     "toast": "/components/toast/toast"

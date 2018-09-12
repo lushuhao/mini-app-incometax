@@ -63,7 +63,7 @@ const taxTitle = {
 
 Page({
   data: {
-    city: '', // 当前定位城市
+    city: '上海市', // 当前定位城市
     earnings: 0,
     incomeTax: 0,
     socialTax: 0,
@@ -82,7 +82,7 @@ Page({
     taxDetailList: ''
   },
   onLoad() {
-    this.init()
+    this.initAddress()
     this.load = true
   },
   /**
@@ -109,18 +109,24 @@ Page({
       path: '/pages/index/index'
     }
   },
-  init() {
+  initAddress() {
     getCurrentAddress()
       .then(location => {
-        let { city = '上海' } = location.address_component || {}
-        city = city.split(/市/)[0]
-        // 对象转数组，再合为一维数组
-        const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
-          return item.name === city
-        })
-        this.initCity(cityInfo.value)
-        this.setData({ city })
+        this.init(location)
       })
+      .catch(err => {
+        console.error(err)
+        this.init()
+      })
+  },
+  init(location = '') {
+    let { city = '上海市' } = location.address_component || {}
+    // 对象转数组，再合为一维数组
+    const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
+      return city.includes(item.name)
+    })
+    this.initCity(cityInfo.value)
+    this.setData({ city })
   },
   /**
    * 根据城市初始化五险一金

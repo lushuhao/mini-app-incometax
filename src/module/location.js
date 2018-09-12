@@ -103,5 +103,6 @@ function setCurrentCity(city) {
 module.exports = {
   getCurrentAddress,
   getCurrentCity,
-  setCurrentCity
+  setCurrentCity,
+  getLocationInStorage
 }

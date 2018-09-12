@@ -3,9 +3,17 @@
              scroll-top="{{scrollTop}}"
              bindscroll="bindScroll"
              class="cityList">
-  <view class="cityListWrapper" wx:for="{{cityList}}" wx:for-index="cityKey" wx:key="{{index}}">
+  <view class="cityListWrapper" wx:for="{{cityList}}" wx:for-index="cityKey" wx:key="{{cityKey}}">
     <view id="{{cityKey}}" class="cityKey">{{cityKey}}</view>
-    <view bindtap="selectCity" data-city="{{city}}" class="cityName" wx:for="{{item}}" wx:for-item="city" wx:key="{{index}}">{{city.name}}</view>
+    <view bindtap="selectCity" data-city="{{city}}" class="{{cityKey !== '热' && cityKey !== '定' ? 'cityName' : 'cityNameButton'}}" wx:for="{{item}}" wx:for-item="city" wx:key="{{index}}">
+      <view class="current {{city.name === '定位失败' ? 'noLoc' : ''}}" wx:if="{{cityKey === '定'}}">
+        <i class="iconfont icon-dingwei-didian-weizhi" />
+        <text class="content" >{{city.name}}</text>
+        <button wx:if="{{!hasAuth}}" class="location" open-type="openSetting" bindopensetting="openSetting">
+        </button>
+      </view>
+      {{ cityKey === '定' ? '' : city.name}}
+    </view>
   </view>
 </scroll-view>
 <view bindtouchstart="touchStart"
