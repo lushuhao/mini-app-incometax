@@ -8,10 +8,9 @@ class User {
       if (this.systemInfo) {
         return resolve(this.systemInfo)
       }
-      const self = this
       wx.getSystemInfo({
-        success(res) {
-          self.systemInfo = res
+        success: (res) => {
+          this.systemInfo = res
           resolve(res)
         }
       })

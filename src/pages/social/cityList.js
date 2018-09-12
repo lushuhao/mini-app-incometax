@@ -39,11 +39,10 @@ Page({
     if (city) {
       return [this.getCityInfo(city)]
     } else {
-      const self = this
       wx.getSetting({
-        success(res) {
+        success: (res) => {
           const hasAuth = !!res.authSetting['scope.userLocation']
-          self.setData({
+          this.setData({
             hasAuth
           })
         }
@@ -88,12 +87,13 @@ Page({
     }
   },
   getShortCutOffset() {
-    const self = this
-    wx.createSelectorQuery().selectAll('.item').boundingClientRect(function (rect) {
-      self.targetList = rect
+    wx.createSelectorQuery().selectAll('.item').boundingClientRect((rect) => {
+      this.targetList = rect
     }).exec()
-    wx.createSelectorQuery().selectAll('.cityKey').boundingClientRect(function (rect) {
-      self.viewTargetList = rect
+    wx.createSelectorQuery().selectAll('.cityKey').boundingClientRect((rect) => {
+      this.viewTargetList = rect.map(item => {
+        return {...item, bottom: item.bottom + 10, top: item.top - 10}
+      })
     }).exec()
   },
   /**
@@ -103,6 +103,7 @@ Page({
    */
   scroll(e) {
     if (this.touch) return
+    this.target = null
     const scrollY = e.detail.scrollTop
     this.viewTargetList.forEach((item, index) => {
       const { top, bottom } = item
@@ -125,7 +126,7 @@ Page({
       const last = this.viewTargetList[lastIndex]
       const nextIndex = index >= this.viewTargetList.length - 1 ? this.viewTargetList.length - 1 : index + 1
       const next = this.viewTargetList[nextIndex]
-      const lastY = top - (top - last.bottom) / 2
+      const lastY = top - (last.bottom - top) / 2
       const nextY = bottom + (next.top - bottom) / 2
       if (lastY < scrollY && nextY > scrollY) {
         this.target = item

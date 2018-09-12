@@ -37,11 +37,12 @@ const mathRound = (number, precision = 2) => {
  * @param context
  * @param args
  */
-const throttle = (cb, delay = 1000 / 60, context, ...args) => {
+function throttle(cb, delay = 1000 / 60) {
+  const [, , context, ...args] = Array.from(arguments)
   if (cb.run) return
   cb.run = true
-  cb.apply(context, args)
   setTimeout(() => {
+    cb.apply(context, args)
     cb.run = false
   }, delay)
 }
