@@ -34,8 +34,6 @@ const mathRound = (number, precision = 2) => {
  * @desc 通过对象是引用的性质，将标志位赋值到外层
  * @param cb
  * @param delay
- * @param context
- * @param args
  */
 function throttle(cb, delay = 1000 / 60) {
   const [, , context, ...args] = Array.from(arguments)

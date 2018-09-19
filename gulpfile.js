@@ -27,8 +27,13 @@ const cssnano = require('gulp-cssnano')
 
 // 判断gulp --type prod 命名 type 是否是生产打包
 const isProd = argv.type === 'prod'
+let isWatch = false
 const src = './src'
 const dist = './dist'
+const tmp = './tmp'
+const getDistDir = () => {
+  return isWatch ? tmp : dist
+}
 const mock = './mock'
 const router = './router'
 
@@ -56,7 +61,7 @@ gulp.task('wxml', () => {
         removeEmptyAttributes: true,//删除所有空格作属性值 <input id="" /> ==> <input />
       }) : through.obj()
     )
-    .pipe(gulp.dest(dist))
+    .pipe(gulp.dest(getDistDir()))
 })
 
 gulp.task('wxss', () => {
@@ -66,7 +71,7 @@ gulp.task('wxss', () => {
     postcss([px2rpx(), base64()]),
     rename((path) => (path.extname = '.wxss')),
     isProd ? cssnano() : through.obj(),
-    gulp.dest(dist)
+    gulp.dest(getDistDir())
   ])
 
   combined.on('error', handleError)
@@ -91,7 +96,7 @@ gulp.task('js', () => {
     }) : through.obj(),
 
     isProd ? through.obj() : sourcemaps.write('./'),
-    gulp.dest(dist)
+    gulp.dest(getDistDir())
   ])
 
   combined.on('error', handleError)
@@ -101,7 +106,7 @@ gulp.task('json', () => {
   return gulp
     .src(`${src}/**/*.json`)
     .pipe(isProd ? jsonminify() : through.obj())
-    .pipe(gulp.dest(dist))
+    .pipe(gulp.dest(getDistDir()))
 })
 
 gulp.task('projectConfig', () => {
@@ -110,11 +115,11 @@ gulp.task('projectConfig', () => {
 })
 
 gulp.task('images', () => {
-  return gulp.src(`${src}/images/**`).pipe(gulp.dest(`${dist}/images`))
+  return gulp.src(`${src}/images/**`).pipe(gulp.dest(`${getDistDir()}/images`))
 })
 
 gulp.task('wxs', () => {
-  return gulp.src(`${src}/**/*.wxs`).pipe(gulp.dest(dist))
+  return gulp.src(`${src}/**/*.wxs`).pipe(gulp.dest(getDistDir()))
 })
 
 gulp.task('collect', () => {
@@ -130,7 +135,7 @@ gulp.task('collect', () => {
     }))
     .pipe(eslint({fix: true}), eslint.format())
     .pipe(gulp.dest(`${src}/collect/`))
-    .pipe(gulp.dest(`${dist}/collect/`))
+    .pipe(gulp.dest(`${getDistDir()}/collect/`))
 })
 
 gulp.task('route', () => {
@@ -146,7 +151,13 @@ gulp.task('route', () => {
   fs.writeFileSync(`${router}/routers.json`, content)
 })
 
+gulp.task('tmp', () => {
+  return gulp.src(`${tmp}/**`)
+    .pipe(gulp.dest(dist))
+})
+
 gulp.task('watch', () => {
+  isWatch = true;
   ['wxml', 'wxss', 'js', 'json', 'wxs'].forEach(v => {
     gulp.watch(`${src}/**/*.${v}`, [v])
   })
@@ -157,15 +168,17 @@ gulp.task('watch', () => {
 })
 
 gulp.task('clean', () => {
-  return del(['./dist/**'])
+  return del([dist, tmp])
 })
 
 gulp.task('dev', () => {
-  runSequence(['route', 'projectConfig'], ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], 'watch')
+  isWatch = true
+  runSequence(['route', 'projectConfig'], ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], 'tmp', 'watch')
 })
 
 gulp.task('build', () => {
-  runSequence('projectConfig', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], () => {
+  isWatch = false
+  runSequence('projectConfig', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], 'tmp', () => {
     log(colors.cyan(`所有文件打包到${dist}`), colors.green('ok'))
   })
 })
