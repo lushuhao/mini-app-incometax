@@ -1,8 +1,6 @@
 //index.js
 import { getCurrentAddress, getCurrentCity } from '../../module/location'
-import cityList from '../../collect/cityList'
-import cityBase from '../../collect/cityBase'
-import socialList from '../../collect/socialList'
+import { getCityListInStorage, getCityBaseInStorage, getSocialListInStorage } from '../../module/mock'
 import { mathRound, splitString2Number } from '../../utils/util'
 
 const incomeTaxList = [0, 3000, 12000, 25000, 35000, 55000, 80000]
@@ -121,31 +119,39 @@ Page({
   },
   init(location = '') {
     let { city = '上海市' } = location.address_component || {}
-    // 对象转数组，再合为一维数组
-    const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
-      return city.includes(item.name)
-    })
-    this.initCity(cityInfo.value)
-    this.setData({ city })
+    getCityListInStorage()
+      .then(cityList => {
+        // 对象转数组，再合为一维数组
+        const cityInfo = Array.prototype.concat(...Object.values(cityList)).find(item => {
+          return city.includes(item.name)
+        })
+        this.initCity(cityInfo.value)
+        this.setData({ city })
+      })
   },
   /**
    * 根据城市初始化五险一金
    * @param city
    */
   initCity(city) {
-    const { shebao, gongjijin } = cityBase[city]
-    this.social = shebao[0]
-    this.reserve = gongjijin[0]
-    this.socialScale = socialList[city]
-    const data = {
-      ...this.initTaxBase(),
-      reserveTaxScaleList: gongjijin.map(item => item.alias)
-    }
     return new Promise(resolve => {
-      this.setData(data, () => {
-        resolve(null)
-      })
+      Promise.all([getCityBaseInStorage(), getSocialListInStorage()])
+        .then(([cityBase, socialList]) => {
+          const { shebao, gongjijin } = cityBase[city]
+          this.social = shebao[0]
+          this.reserve = gongjijin[0]
+          this.socialScale = socialList[city]
+          const data = {
+            ...this.initTaxBase(),
+            reserveTaxScaleList: gongjijin.map(item => item.alias)
+          }
+
+          this.setData(data, () => {
+            resolve(null)
+          })
+        })
     })
+
   },
   // 初始化费用基数
   initTaxBase() {

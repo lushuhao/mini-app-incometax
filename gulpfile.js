@@ -27,14 +27,11 @@ const cssnano = require('gulp-cssnano')
 
 // 判断gulp --type prod 命名 type 是否是生产打包
 const isProd = argv.type === 'prod'
-let isWatch = false
 const src = './src'
 const dist = './dist'
-const tmp = './tmp'
 const getDistDir = () => {
-  return isWatch ? tmp : dist
+  return dist
 }
-const mock = './mock'
 const router = './router'
 
 function isFixed(file) {
@@ -80,7 +77,7 @@ gulp.task('wxss', () => {
 gulp.task('js', () => {
   const combined = combiner.obj([
     gulp.src([`${src}/**/*.js`, `!${src}/collect/**`]),
-    eslint({fix: true}),
+    eslint({ fix: true }),
     eslint.format(),
     gulpIf(isFixed, gulp.dest(src)), // 修复后的文件放回原处
     eslint.failAfterError(),
@@ -123,7 +120,7 @@ gulp.task('wxs', () => {
 })
 
 gulp.task('collect', () => {
-  return gulp.src([`${router}/*.json`, `${mock}/**/*.json`])
+  return gulp.src([`${router}/*.json`])
     .pipe(through.obj(function (file, enc, cb) {
       file.contents = Buffer.concat([Buffer.from('module.exports = '), file.contents])
       this.push(file)
@@ -133,13 +130,13 @@ gulp.task('collect', () => {
     .pipe(rename({
       extname: ".js"
     }))
-    .pipe(eslint({fix: true}), eslint.format())
+    .pipe(eslint({ fix: true }), eslint.format())
     .pipe(gulp.dest(`${src}/collect/`))
     .pipe(gulp.dest(`${getDistDir()}/collect/`))
 })
 
 gulp.task('route', () => {
-  const {pages} = require(`${src}/app.json`)
+  const { pages } = require(`${src}/app.json`)
   const routers = {}
   pages.forEach(path => {
     // pages/index/index -> index_index
@@ -151,13 +148,7 @@ gulp.task('route', () => {
   fs.writeFileSync(`${router}/routers.json`, content)
 })
 
-gulp.task('tmp', () => {
-  return gulp.src(`${tmp}/**`)
-    .pipe(gulp.dest(dist))
-})
-
 gulp.task('watch', () => {
-  isWatch = true;
   ['wxml', 'wxss', 'js', 'json', 'wxs'].forEach(v => {
     gulp.watch(`${src}/**/*.${v}`, [v])
   })
@@ -168,17 +159,15 @@ gulp.task('watch', () => {
 })
 
 gulp.task('clean', () => {
-  return del([dist, tmp])
+  return del(dist)
 })
 
 gulp.task('dev', () => {
-  isWatch = true
-  runSequence(['route', 'projectConfig'], ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], 'tmp', 'watch')
+  runSequence(['route', 'projectConfig'], ['collect', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs'], 'watch')
 })
 
 gulp.task('build', () => {
-  isWatch = false
-  runSequence('projectConfig', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], 'tmp', () => {
+  runSequence('projectConfig', 'route', ['collect', 'js', 'json', 'images', 'wxml', 'wxss', 'wxs'], () => {
     log(colors.cyan(`所有文件打包到${dist}`), colors.green('ok'))
   })
 })

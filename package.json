@@ -27,7 +27,8 @@
   "homepage": "https://github.com/lushuhao/mini-app-salary#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "gulp-eslint": "^5.0.0"
+    "gulp-eslint": "^5.0.0",
+    "regenerator-runtime": "^0.12.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

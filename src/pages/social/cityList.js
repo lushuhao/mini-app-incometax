@@ -1,5 +1,5 @@
 import { setCurrentCity, getLocationInStorage, getCurrentAddress } from '../../module/location'
-import cityList from '../../collect/cityList'
+import { getCityListInStorage } from '../../module/mock'
 import { throttle } from '../../utils/util'
 
 const hotCity = ['北京', '上海', '广州', '深圳', '天津', '南京', '杭州', '武汉', '重庆']
@@ -21,17 +21,21 @@ Page({
     })
   },
   getCityList() {
-    const list = {
-      '定': this.setLocationCity(),
-      '热': this.setHotCity(),
-      ...cityList
-    }
-    this.setData({
-      cityList: list,
-      cityKeyList: Object.keys(list)
-    }, () => {
-      this.getShortCutOffset()
-    })
+    getCityListInStorage()
+      .then(cityList => {
+        this.cityList = cityList
+        const list = {
+          '定': this.setLocationCity(),
+          '热': this.setHotCity(),
+          ...cityList
+        }
+        this.setData({
+          cityList: list,
+          cityKeyList: Object.keys(list)
+        }, () => {
+          this.getShortCutOffset()
+        })
+      })
   },
   setLocationCity(location) {
     location = location || getLocationInStorage()
@@ -62,7 +66,7 @@ Page({
    */
   getCityInfo(city) {
     if (!this.list) {
-      const keyList = Object.values(cityList)
+      const keyList = Object.values(this.cityList)
       this.list = [].concat(...keyList)
     }
     return this.list.find(item => city.includes(item.name))
