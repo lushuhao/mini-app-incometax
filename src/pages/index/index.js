@@ -69,7 +69,7 @@ Page({
     socialTax: 0,
     reserveTax: 0,
     grossWage: '', // 税前工资
-    threshold: 3500, // 个税起征点
+    threshold: 5000, // 个税起征点
     hasSocialTax: false,
     socialTaxBase: '', // 社保基数
     hasReserveTax: false,
